@@ -62,10 +62,17 @@ export class NegociosService implements OnModuleInit {
     return this.repo.find({ order: { calificacion: 'DESC' }, take: cantidad });
   }
 
-  async uno(id: number) {
+  // Uso interno: devuelve la entidad completa (con dueño) para validar permisos y guardar
+  private async cargar(id: number) {
     const negocio = await this.repo.findOne({ where: { id }, relations: ['owner'] });
     if (!negocio) throw new NotFoundException('Negocio no encontrado');
     return negocio;
+  }
+
+  // Uso público: solo expone id y nombre del dueño (nunca el hash ni el correo)
+  async uno(id: number) {
+    const negocio = await this.cargar(id);
+    return { ...negocio, owner: negocio.owner ? { id: negocio.owner.id, nombre: negocio.owner.nombre } : null };
   }
 
   async crear(dto: CrearNegocioDto, owner?: Usuario) {
@@ -78,7 +85,7 @@ export class NegociosService implements OnModuleInit {
   }
 
   async actualizar(id: number, dto: ActualizarNegocioDto, userId?: number) {
-    const negocio = await this.uno(id);
+    const negocio = await this.cargar(id);
 
     if (userId && negocio.owner && negocio.owner.id !== userId) {
       throw new ForbiddenException('No tienes permisos para modificar este negocio');
@@ -89,7 +96,7 @@ export class NegociosService implements OnModuleInit {
   }
 
   async eliminar(id: number, userId?: number) {
-    const negocio = await this.uno(id);
+    const negocio = await this.cargar(id);
 
     if (userId && negocio.owner && negocio.owner.id !== userId) {
       throw new ForbiddenException('No tienes permisos para eliminar este negocio');
@@ -104,7 +111,7 @@ export class NegociosService implements OnModuleInit {
     
     return negocios
       .map((negocio) => {
-        let distanciaKm = null;
+        let distanciaKm: number | null = null;
         if (negocio.latitud !== null && negocio.longitud !== null) {
           distanciaKm = this.calcularDistanciaHaversine(lat, lng, negocio.latitud, negocio.longitud);
         }
@@ -130,19 +137,19 @@ export class NegociosService implements OnModuleInit {
   }
 
   async registrarClicWhatsapp(id: number) {
-    const negocio = await this.uno(id);
+    const negocio = await this.cargar(id);
     negocio.clicsWhatsapp += 1;
     return await this.repo.save(negocio);
   }
 
   async registrarClicLlamada(id: number) {
-    const negocio = await this.uno(id);
+    const negocio = await this.cargar(id);
     negocio.clicsLlamada += 1;
     return await this.repo.save(negocio);
   }
 
   async actualizarFotos(id: number, imagenUrl?: string, galeria?: string[], userId?: number) {
-    const negocio = await this.uno(id);
+    const negocio = await this.cargar(id);
 
     if (userId && negocio.owner && negocio.owner.id !== userId) {
       throw new ForbiddenException('No tienes permisos para modificar las fotos de este negocio');

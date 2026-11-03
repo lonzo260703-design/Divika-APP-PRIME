@@ -40,7 +40,7 @@ export class Usuario {
   @Column({ nullable: true })
   codigoOtp: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: Date, nullable: true }) // type: Date funciona en SQLite, Postgres y MySQL
   otpExpiraEn: Date;
 
   // MODIFICACIÓN: Identificador único de Google para login social

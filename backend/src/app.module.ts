@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { NegociosModule } from './modules/negocios/negocios.module';
+import { FavoritosModule } from './modules/favoritos/favoritos.module';
+import { ResenasModule } from './modules/resenas/resenas.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }), // lee backend/.env
     // SQLite = base de datos SQL en un solo archivo, sin instalar nada.
     // Para usar PostgreSQL o MySQL solo cambia este bloque (ver README).
     TypeOrmModule.forRoot({
@@ -17,6 +21,8 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
     UsuariosModule,
     NegociosModule,
     AuthModule,
+    ResenasModule,
+    FavoritosModule,
   ],
 })
 export class AppModule {}

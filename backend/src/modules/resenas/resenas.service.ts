@@ -15,11 +15,13 @@ export class ResenasService {
 
   // Listar todas las reseñas de un negocio específico
   async listarPorNegocio(negocioId: number) {
-    return await this.repo.find({
+    const resenas = await this.repo.find({
       where: { negocio: { id: negocioId } },
       relations: ['usuario'],
       order: { creadoEn: 'DESC' },
     });
+    // Solo exponemos id y nombre del autor (nunca el hash ni el correo)
+    return resenas.map((r) => ({ ...r, usuario: { id: r.usuario.id, nombre: r.usuario.nombre } }));
   }
 
   // Crear una nueva reseña/calificación y actualizar el promedio del negocio
