@@ -1,0 +1,29 @@
+import { getToken } from './auth';
+
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
+type Opciones = { method?: string; body?: unknown };
+
+// Un solo lugar para hablar con el backend de NestJS
+export async function api<T>(ruta: string, { method = 'GET', body }: Opciones = {}): Promise<T> {
+  const token = getToken();
+  let res: Response;
+  try {
+    res = await fetch(`${API}${ruta}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. ¿Está encendido el backend?');
+  }
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    const mensaje = Array.isArray(error?.message) ? error.message.join('. ') : error?.message;
+    throw new Error(mensaje ?? 'Algo salió mal');
+  }
+  return res.json();
+}

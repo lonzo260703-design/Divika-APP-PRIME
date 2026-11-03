@@ -1,0 +1,32 @@
+/* ============================================================
+   TODO EL ESTILO SE CAMBIA AQUÍ. Toca estos valores y cambia
+   toda la app. Colores tomados de tu plantilla de Figma.
+   ============================================================ */
+:root {
+  /* Colores */
+  --color-fondo: #f7f7f9;        /* fondo de pantallas */
+  --color-superficie: #ffffff;   /* tarjetas, inputs */
+  --color-tinta: #1f1d3d;        /* texto y bordes */
+  --color-primario: #6b6a9c;     /* botón principal */
+  --color-acento: #f26b3a;       /* naranja de los pines del logo */
+  --color-categorias: #c4b5fd;   /* recuadro morado de iconos */
+  --color-gris: #dcdcdc;         /* placeholders de imagen */
+  --color-cinta: #000000;        /* listón del número en las cards */
+  --color-error: #b3261e;
+
+  /* "Rudimentario": bordes gruesos, esquinas casi rectas, sombra dura.
+     Para suavizarlo: --borde con 1px, --radio 16px y --sombra none. */
+  --borde: 2px solid var(--color-tinta);
+  --radio: 4px;
+  --sombra: 3px 3px 0 var(--color-tinta);
+
+  /* Espaciado */
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+
+  /* Tipografía */
+  --fuente: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}

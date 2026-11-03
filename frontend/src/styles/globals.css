@@ -1,0 +1,204 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #2a2a2a;
+  color: var(--color-tinta);
+  font-family: var(--fuente);
+  font-size: 15px;
+}
+
+a { color: var(--color-primario); font-weight: 600; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--color-acento); outline-offset: 2px; }
+
+/* ---------- Marco tipo teléfono ---------- */
+.frame {
+  width: 100%;
+  max-width: 390px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-fondo);
+  overflow: hidden;
+}
+@media (min-width: 480px) {
+  .frame { height: min(100vh - 32px, 780px); border: var(--borde); border-radius: 24px; }
+}
+
+.screen {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  padding: var(--espacio-4);
+}
+.screen--centro { justify-content: center; }
+
+.fila { display: flex; gap: var(--espacio-3); justify-content: center; }
+.texto-aparte { text-align: center; font-size: 13px; }
+.seccion { font-size: 18px; margin-bottom: var(--espacio-3); }
+
+/* ---------- Logo ---------- */
+.logo { text-align: center; }
+.logo__pines { font-size: 22px; letter-spacing: 18px; }
+.logo__marca { font-size: 48px; font-weight: 800; color: var(--color-tinta); line-height: 1; }
+.logo__lema { margin-top: var(--espacio-2); font-size: 11px; font-weight: 600; }
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border: var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+.btn:active { transform: translate(2px, 2px); box-shadow: none; }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+.btn--primary { background: var(--color-primario); color: #fff; }
+.btn--secondary { background: var(--color-superficie); color: var(--color-tinta); }
+
+/* ---------- Formularios ---------- */
+.form { display: flex; flex-direction: column; gap: var(--espacio-3); }
+.field { display: flex; flex-direction: column; gap: var(--espacio-1); }
+.field__label { font-size: 13px; font-weight: 700; }
+.field__input {
+  padding: 10px;
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  font: inherit;
+}
+.form__error { color: var(--color-error); font-size: 13px; font-weight: 600; }
+
+.tabs { display: flex; border: var(--borde); border-radius: var(--radio); overflow: hidden; }
+.tabs__tab { flex: 1; padding: 10px; border: 0; background: var(--color-superficie); font-weight: 700; }
+.tabs__tab + .tabs__tab { border-left: var(--borde); }
+.tabs__tab--activa { background: var(--color-categorias); }
+
+/* ---------- Buscador, banner, categorías ---------- */
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: 0 var(--espacio-3);
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: var(--color-gris);
+}
+.search__input { flex: 1; padding: 12px 0; border: 0; background: transparent; font: inherit; outline: none; }
+
+.promo {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: var(--color-acento);
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  text-align: center;
+  padding: var(--espacio-3);
+}
+
+.categorias {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--espacio-3);
+  padding: var(--espacio-4);
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: var(--color-categorias);
+}
+.categorias__item {
+  aspect-ratio: 1;
+  font-size: 26px;
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: transparent;
+}
+.categorias__item--activa { background: var(--color-superficie); box-shadow: var(--sombra); }
+
+/* ---------- Carruseles ---------- */
+.carrusel { display: flex; gap: var(--espacio-3); overflow-x: auto; padding: 2px 4px 8px 2px; }
+.pressable { flex: none; padding: 0; border: 0; background: none; text-align: left; }
+
+/* ---------- Card (una sola, dos variantes) ---------- */
+.card {
+  position: relative;
+  flex: none;
+  border: var(--borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+.card__image { display: block; width: 100%; object-fit: cover; }
+.card__image--vacio { display: grid; place-items: center; background: var(--color-gris); font-size: 40px; }
+.card__title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card__subtitle { font-size: 12px; }
+
+/* overlay: imagen de fondo con texto encima (Top 10) */
+.card--overlay { width: 150px; height: 200px; background: #000; color: #fff; }
+.card--overlay .card__image { position: absolute; inset: 0; height: 100%; }
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+}
+.card--overlay .card__content { position: absolute; left: 0; right: 0; bottom: var(--espacio-3); padding: 0 var(--espacio-2); }
+.card--overlay .card__subtitle { color: rgba(255,255,255,0.75); }
+
+/* Listón con muesca (24x38, muesca de 10px, igual que el original) */
+.card__badge {
+  position: absolute;
+  top: 0;
+  left: var(--espacio-5);
+  width: 24px;
+  height: 38px;
+  padding-top: 2px;
+  background: var(--color-cinta);
+  color: #fff;
+  font-weight: 800;
+  text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 10px), 0 100%);
+}
+
+/* stack: imagen arriba, texto abajo (Cerca de ti) */
+.card--stack { width: 190px; }
+.card--stack .card__image { height: 120px; }
+.card--stack .card__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-3);
+  border-top: var(--borde);
+}
+.card--stack .card__subtitle { flex: none; font-weight: 700; }
+
+/* ---------- Barra inferior ---------- */
+.nav { display: flex; justify-content: space-around; padding: var(--espacio-2); border-top: var(--borde); background: var(--color-superficie); }
+.nav__item {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 44px;
+  font-size: 22px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--radio);
+}
+.nav__item--activo { border-color: var(--color-tinta); background: var(--color-categorias); }
+.nav__item--apagado { opacity: 0.35; }
+
+/* ---------- Perfil ---------- */
+.datos { display: grid; gap: var(--espacio-1); padding: var(--espacio-4); border: var(--borde); border-radius: var(--radio); background: var(--color-superficie); }
+.datos dt { font-size: 12px; font-weight: 700; margin-top: var(--espacio-2); }

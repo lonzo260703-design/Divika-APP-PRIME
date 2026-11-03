@@ -1,0 +1,22 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './modules/auth/auth.module';
+import { NegociosModule } from './modules/negocios/negocios.module';
+import { UsuariosModule } from './modules/usuarios/usuarios.module';
+
+@Module({
+  imports: [
+    // SQLite = base de datos SQL en un solo archivo, sin instalar nada.
+    // Para usar PostgreSQL o MySQL solo cambia este bloque (ver README).
+    TypeOrmModule.forRoot({
+      type: 'better-sqlite3',
+      database: process.env.DB_FILE ?? 'divika.sqlite',
+      autoLoadEntities: true,
+      synchronize: true, // crea/ajusta las tablas solo. Útil en desarrollo, no en producción.
+    }),
+    UsuariosModule,
+    NegociosModule,
+    AuthModule,
+  ],
+})
+export class AppModule {}
