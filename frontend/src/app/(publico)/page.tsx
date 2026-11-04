@@ -6,8 +6,16 @@ import { Logo } from '@/components/layout/Logo';
 import { Aviso } from '@/components/ui/Aviso';
 import { ButtonLink, Button } from '@/components/ui/Button';
 import { IconApple, IconGoogle } from '@/components/ui/icons';
+import { LandingWeb } from '@/components/web/LandingWeb';
+import { useEscritorio } from '@/lib/useEscritorio';
 
-export default function Bienvenida() {
+export default function Inicio() {
+  const escritorio = useEscritorio();
+  if (escritorio === null) return null;
+  return escritorio ? <LandingWeb /> : <Bienvenida />;
+}
+
+function Bienvenida() {
   const [aviso, setAviso] = useState('');
 
   return (

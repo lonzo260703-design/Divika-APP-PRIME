@@ -19,6 +19,15 @@
   --color-google: #4285f4;
   --color-sms: #38c96a;
 
+  /* Versión web (colores de los diseños de escritorio) */
+  --web-hero: #dfe2ee;           /* fondo del hero y de las franjas */
+  --web-azul: #1f5f9e;           /* botones Contactar / Buscar */
+  --web-oscuro: #1c2340;         /* buscador del hero y botón del formulario */
+  --web-morado: #4a3f8c;         /* fondo del login */
+  --web-lavanda: #d9dce8;        /* tarjeta del login */
+  --web-carmesi: #c0104e;        /* botón Iniciar sesión */
+  --web-ancho: 1160px;           /* ancho máximo del contenido */
+
   /* Forma: suave (como el diseño). Para el estilo "rudimentario" anterior:
      --borde: 2px solid var(--color-tinta); --radio: 4px; --sombra: 3px 3px 0 var(--color-tinta); */
   --borde: 1px solid var(--color-borde);

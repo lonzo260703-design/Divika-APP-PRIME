@@ -42,6 +42,11 @@ Se editan en `backend/src/modules/negocios/categorias.ts`. El icono de cada una 
 | GET | `/resenas/negocio/:negocioId` | Reseñas del negocio, más recientes primero |
 | POST 🔒 | `/resenas` | `{ negocioId, calificacion (1-5), comentario? }`; recalcula el promedio del negocio |
 
+## Proveedores (sitio web)
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/proveedores/interesados` | Formulario "Únete gratis" de la landing, sin sesión: `{ nombreNegocio, servicio, telefono, ciudad }`. Responde `{ ok: true }` |
+
 ## Favoritos
 | Método | Ruta | Descripción |
 |---|---|---|

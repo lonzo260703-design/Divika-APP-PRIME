@@ -31,7 +31,7 @@ Cambios en datos existentes:
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| POST | `/proveedores/interesados` | Formulario "Únete gratis" de la landing, **sin sesión**: `{ nombreNegocio, servicio, telefono, ciudad }`. Guarda el contacto para seguimiento comercial. Responde `{ ok: true }` |
+| POST | `/proveedores/interesados` | **Ya existe en este backend.** Formulario "Únete gratis" de la landing, **sin sesión**: `{ nombreNegocio, servicio, telefono, ciudad }`. Guarda el contacto para seguimiento comercial. Responde `{ ok: true }` |
 
 ## 2. Perfil del negocio
 | Método | Ruta | Descripción |

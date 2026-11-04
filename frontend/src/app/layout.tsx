@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import '@fontsource-variable/inter';
 import '@/styles/tokens.css';
 import '@/styles/globals.css';
+import '@/styles/web.css';
 
 export const metadata: Metadata = {
   title: 'Divika',

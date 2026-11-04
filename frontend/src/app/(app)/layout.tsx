@@ -11,7 +11,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const [listo, setListo] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) router.replace('/');
+    // Sin sesión: en celular al inicio; en escritorio a la pantalla de acceso (el inicio web es público)
+    if (!getToken()) router.replace(window.matchMedia('(min-width: 900px)').matches ? '/login' : '/');
     else setListo(true);
   }, [router]);
 

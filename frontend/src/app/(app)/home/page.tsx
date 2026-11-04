@@ -21,6 +21,12 @@ export default function HomePage() {
   const [error, setError] = useState('');
   const [cargado, setCargado] = useState(false);
 
+  // Si vienes del buscador del sitio web (/home?buscar=...), arranca con esa búsqueda
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('buscar');
+    if (q) setBuscar(q);
+  }, []);
+
   // Cada vez que cambia la búsqueda o la categoría, pide la lista al backend
   useEffect(() => {
     const params = new URLSearchParams();
