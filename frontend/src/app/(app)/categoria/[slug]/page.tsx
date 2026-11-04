@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Atras } from '@/components/layout/Atras';
 import { NegocioGridCard } from '@/components/negocio/NegocioGridCard';
@@ -15,6 +15,7 @@ type Ubicacion = { lat: number; lng: number };
 
 export default function CategoriaPage() {
   const { slug } = useParams<{ slug: string }>();
+  const router = useRouter();
   const { categorias, cargando } = useCategorias();
   const categoria = categorias.find((c) => c.slug === slug);
 
@@ -104,7 +105,7 @@ export default function CategoriaPage() {
       {listo && !error && negocios.length === 0 && <p className="texto-aparte">No encontramos negocios con esa búsqueda.</p>}
       <div className="resultados">
         {negocios.map((n) => (
-          <NegocioGridCard key={n.id} negocio={n} />
+          <NegocioGridCard key={n.id} negocio={n} onPress={() => router.push(`/negocio/${n.id}`)} />
         ))}
       </div>
     </>

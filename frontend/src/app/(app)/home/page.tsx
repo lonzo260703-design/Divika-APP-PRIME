@@ -53,7 +53,7 @@ export default function HomePage() {
         {cargado && !error && negocios.length === 0 && <p className="texto-aparte">No encontramos negocios con esa búsqueda.</p>}
         <div className="carrusel">
           {negocios.map((n) => (
-            <NegocioCard key={n.id} negocio={n} />
+            <NegocioCard key={n.id} negocio={n} onPress={() => router.push(`/negocio/${n.id}`)} />
           ))}
         </div>
       </section>
@@ -62,7 +62,7 @@ export default function HomePage() {
         <h2 className="seccion">Top 10</h2>
         <div className="carrusel">
           {top.map((n, i) => (
-            <TopTenItem key={n.id} imageUrl={n.imagenUrl ?? undefined} title={n.nombre} subtitle={n.categoria} position={i + 1} />
+            <TopTenItem key={n.id} imageUrl={n.imagenUrl ?? undefined} title={n.nombre} subtitle={n.categoria} position={i + 1} onPress={() => router.push(`/negocio/${n.id}`)} />
           ))}
         </div>
       </section>

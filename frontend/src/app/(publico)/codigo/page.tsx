@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { IconCheck } from '@/components/ui/icons';
 import { entrar } from '@/lib/auth';
 import { CodigoPendiente, borrarPendiente, leerPendiente, pedirCodigo } from '@/lib/codigo';
+import { formatoTelefono } from '@/lib/formato';
 
-const formatoTelefono = (t: string) => t.replace(/\D/g, '').slice(-10).replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
 const reloj = (seg: number) => `${String(Math.floor(seg / 60)).padStart(2, '0')}:${String(seg % 60).padStart(2, '0')}`;
 
 export default function CodigoPage() {

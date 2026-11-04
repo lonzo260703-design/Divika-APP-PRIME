@@ -14,6 +14,8 @@ const ITEMS = [
 
 export function BottomNav() {
   const ruta = usePathname();
+  // Categorías y detalle de negocio cuelgan de Inicio
+  const activo = (href: string) => ruta === href || (href === '/home' && /^\/(categoria|negocio)\//.test(ruta));
   return (
     <nav className="nav" aria-label="Navegación principal">
       {ITEMS.map(({ nombre, icono, href }) => (
@@ -21,8 +23,8 @@ export function BottomNav() {
           key={nombre}
           href={href}
           aria-label={nombre}
-          aria-current={ruta === href ? 'page' : undefined}
-          className={cx('nav__item', ruta === href && 'nav__item--activo')}
+          aria-current={activo(href) ? 'page' : undefined}
+          className={cx('nav__item', activo(href) && 'nav__item--activo')}
         >
           {icono}
         </Link>

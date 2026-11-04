@@ -57,3 +57,5 @@ export const IconLogout = () => <Icono><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9
 export const IconTrash = () => <Icono><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></Icono>;
 export const IconChevron = () => <Icono width="16" height="16"><path d="m9 5 7 7-7 7" /></Icono>;
 export const IconSort = () => <Icono width="14" height="14"><path d="M7 4v16M7 4 4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3" /></Icono>;
+export const IconClock = () => <Icono width="16" height="16"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icono>;
+export const IconStar = () => <Icono width="16" height="16" fill="currentColor"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" /></Icono>;
