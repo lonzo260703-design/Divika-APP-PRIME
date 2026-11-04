@@ -33,7 +33,7 @@ export function Cabecera() {
         ) : (
           <Link href="/login" className="web-cab__enlace">Inicia sesión</Link>
         )}
-        <Link href="/proveedores" className="web-cab__boton">Registra tu negocio</Link>
+        <Link href={usuario?.rol === 'negocio' ? '/portal' : '/proveedores'} className="web-cab__boton">{usuario?.rol === 'negocio' ? 'Mi portal' : 'Registra tu negocio'}</Link>
       </nav>
     </header>
   );

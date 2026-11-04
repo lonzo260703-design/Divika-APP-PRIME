@@ -6,6 +6,7 @@ Base: `http://localhost:3001`. Rutas con 🔒 requieren `Authorization: Bearer <
 | Método | Ruta | Descripción |
 |---|---|---|
 | POST | `/auth/registro/cliente` | `{ nombre, email, telefono (10 dígitos), password }`. No verifica el teléfono: eso se hace con el código |
+| POST | `/auth/registro/proveedor` | Alta desde el sitio web: `{ nombre, apellidos, email, password, negocio: { nombre, categoria, telefono, ciudad, colonia }, aceptaTerminos: true, recibirNovedades? }`. Crea usuario y negocio en estado `en_proceso` (no sale en el directorio hasta publicar). Devuelve `{ token, usuario }` |
 | POST | `/auth/registro/negocio` | Crea usuario y negocio en una transacción (`categoria` y `subcategoria` opcional) |
 | POST | `/auth/login` | Correo y contraseña. Devuelve `{ token, usuario }` |
 | POST | `/auth/codigo/enviar` | `{ canal: 'sms' \| 'email', destino }`. Genera un código de 4 dígitos. Responde igual exista o no la cuenta. Un envío por minuto (429 si se repite antes) |
@@ -41,6 +42,21 @@ Se editan en `backend/src/modules/negocios/categorias.ts`. El icono de cada una 
 |---|---|---|
 | GET | `/resenas/negocio/:negocioId` | Reseñas del negocio, más recientes primero |
 | POST 🔒 | `/resenas` | `{ negocioId, calificacion (1-5), comentario? }`; recalcula el promedio del negocio |
+
+## Mi negocio (proveedor) 🔒
+Para usuarios con `rol = 'negocio'`; siempre operan sobre su propio negocio.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/proveedor/negocio` | Su negocio, con `estado` (`en_proceso`, `publicado`, `pausado`) |
+| PUT | `/proveedor/negocio` | `{ nombre?, categoria?, subcategoria?, descripcion? (máx. 600), telefono?, whatsapp?, emailPublico?, ciudad?, colonia? }` |
+| POST | `/proveedor/negocio/publicar` | Pasa a `publicado`. 422 si falta nombre, descripción, teléfono o al menos una foto |
+| POST | `/proveedor/negocio/pausar` | De `publicado` a `pausado` |
+| POST | `/proveedor/negocio/fotos` | `multipart/form-data`, campo `foto` (JPG o PNG, máx. 10 MB, hasta 10). Devuelve el negocio |
+| PUT | `/proveedor/negocio/fotos/orden` | `{ orden: [2, 0, 1] }`: índices de la galería en el orden nuevo. La primera es la portada |
+| DELETE | `/proveedor/negocio/fotos/:indice` | Quita la foto en esa posición |
+
+Solo los negocios `publicado` salen en `/negocios`, `/negocios/top` y `/negocios/cercanos`. Las fotos subidas se guardan en `backend/uploads/` y se sirven en `/uploads/...`; la variable `PUBLIC_URL` arma el enlace completo.
 
 ## Proveedores (sitio web)
 | Método | Ruta | Descripción |

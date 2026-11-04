@@ -59,3 +59,9 @@ export const IconChevron = () => <Icono width="16" height="16"><path d="m9 5 7 7
 export const IconSort = () => <Icono width="14" height="14"><path d="M7 4v16M7 4 4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3" /></Icono>;
 export const IconClock = () => <Icono width="16" height="16"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icono>;
 export const IconStar = () => <Icono width="16" height="16" fill="currentColor"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" /></Icono>;
+export const IconGrid = () => <Icono width="18" height="18"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></Icono>;
+export const IconStore = () => <Icono width="18" height="18"><path d="M4 9 5.5 4h13L20 9M4 9v11h16V9M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9M10 20v-5h4v5" /></Icono>;
+export const IconScissors = () => <Icono width="18" height="18"><circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><path d="M8.5 8 20 18M8.5 16 20 6" /></Icono>;
+export const IconClipboard = () => <Icono width="18" height="18"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9zM9 12h6M9 16h4" /></Icono>;
+export const IconExternal = () => <Icono width="14" height="14"><path d="M14 4h6v6M20 4 10 14M18 14v6H4V6h6" /></Icono>;
+export const IconMenu = () => <Icono><path d="M4 7h16M4 12h16M4 17h16" /></Icono>;

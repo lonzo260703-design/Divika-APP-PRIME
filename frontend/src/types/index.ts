@@ -3,6 +3,7 @@ export type Rol = 'cliente' | 'negocio';
 export type Usuario = {
   id: number;
   nombre: string;
+  apellidos?: string | null;
   email: string;
   rol: Rol;
   telefono?: string | null;
@@ -13,14 +14,22 @@ export type Sesion = { token: string; usuario: Usuario };
 
 export type HorarioDia = { apertura: string; cierre: string; cerrado: boolean };
 
+export type EstadoNegocio = 'en_proceso' | 'publicado' | 'pausado';
+
 export type Negocio = {
   id: number;
   nombre: string;
   descripcionCorta: string | null;
+  descripcion?: string | null;
   categoria: string;
   subcategoria: string | null;
   telefono: string;
   direccion: string;
+  ciudad?: string | null;
+  colonia?: string | null;
+  whatsapp?: string | null;
+  emailPublico?: string | null;
+  estado?: EstadoNegocio;
   latitud: number | null;
   longitud: number | null;
   horario: string | null;

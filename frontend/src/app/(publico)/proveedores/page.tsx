@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { useFormulario } from '@/components/forms/useFormulario';
 import { Cabecera } from '@/components/web/Cabecera';
@@ -41,7 +42,10 @@ export default function ProveedoresPage() {
         <div className="web-prov__form">
           <h2>Únete gratis a Divika</h2>
           {enviado ? (
-            <p className="web-prov__ok" role="status">¡Gracias! Recibimos tus datos y te contactaremos muy pronto.</p>
+            <>
+              <p className="web-prov__ok" role="status">¡Gracias! Recibimos tus datos y te contactaremos muy pronto.</p>
+              <Link href="/proveedores/registro" className="web-btn web-btn--oscuro web-btn--block web-prov__sigue">Crear mi cuenta ahora</Link>
+            </>
           ) : (
             <form onSubmit={onSubmit}>
               <input name="nombreNegocio" required placeholder="Nombre de tu negocio o servicio" aria-label="Nombre de tu negocio o servicio" />
@@ -52,6 +56,7 @@ export default function ProveedoresPage() {
               <button type="submit" className="web-btn web-btn--oscuro web-btn--block" disabled={cargando}>
                 {cargando ? 'Enviando…' : 'Registrar mi negocio'}
               </button>
+              <p className="web-prov__otro">¿Prefieres crear tu cuenta ya? <Link href="/proveedores/registro">Empieza aquí</Link></p>
             </form>
           )}
         </div>

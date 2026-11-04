@@ -9,13 +9,15 @@ export async function api<T>(ruta: string, { method = 'GET', body }: Opciones = 
   const token = getToken();
   let res: Response;
   try {
+    // FormData (subir fotos): el navegador pone solo el Content-Type con su separador
+    const esArchivo = body instanceof FormData;
     res = await fetch(`${API}${ruta}`, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        ...(esArchivo ? {} : { 'Content-Type': 'application/json' }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? (esArchivo ? body : JSON.stringify(body)) : undefined,
     });
   } catch {
     throw new Error('No se pudo conectar con el servidor. ¿Está encendido el backend?');

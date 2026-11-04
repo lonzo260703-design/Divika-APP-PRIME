@@ -4,6 +4,9 @@ Rutas y datos que necesitan las pantallas web del diseño y que **todavía no ex
 
 Convenciones: las mismas de `docs/api.md` (JSON, errores `{ message }` en español, fechas ISO 8601, montos en MXN como número).
 
+## Ya implementado en el backend de referencia
+`POST /auth/registro/proveedor`, `GET/PUT /proveedor/negocio`, `POST /proveedor/negocio/publicar` y `/pausar`, fotos del negocio (subir, reordenar, quitar) y `POST /proveedores/interesados`. Están documentadas en `docs/api.md`. Dos diferencias con lo propuesto abajo, para simplificar: las fotos se identifican por **posición** (índice) y no tienen etiqueta, y el correo de verificación de la cuenta no se envía todavía.
+
 ## Prioridad
 | Prioridad | Qué | Por qué |
 |---|---|---|

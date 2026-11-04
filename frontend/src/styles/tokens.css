@@ -45,3 +45,15 @@
   /* Tipografía */
   --fuente: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* Portal del proveedor */
+:root {
+  --portal-morado: #4b3f8f;      /* botones y elementos activos */
+  --portal-fondo: #f6f5fb;       /* fondo de las pantallas */
+  --portal-borde: #e6e4f1;
+  --portal-suave: #ecebf7;       /* menú activo, chips */
+  --portal-verde: #1e7f4f;
+  --portal-verde-fondo: #e3f4ea;
+  --portal-ambar: #8a5a00;
+  --portal-ambar-fondo: #fdf1d6;
+}

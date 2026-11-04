@@ -31,7 +31,7 @@ export function LoginWeb({ tipo }: { tipo: 'usuario' | 'proveedor' }) {
       cerrarSesion();
       throw new Error('Esta cuenta no es de proveedor. Entra desde el acceso de usuarios.');
     }
-    router.push('/home');
+    router.push(proveedor ? '/portal' : '/home');
   });
 
   const pronto = (red: string) => {
