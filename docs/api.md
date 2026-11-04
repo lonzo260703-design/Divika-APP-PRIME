@@ -90,5 +90,8 @@ Esta sección es para quien implemente el backend en otra tecnología (por ejemp
 - **Distancia:** en kilómetros, calculada desde `lat` y `lng` del usuario (fórmula haversine).
 - **Orden por defecto:** por calificación descendente.
 
+## Portal del proveedor y sitio web
+Las rutas nuevas que pide el diseño web están en [`api-portal-proveedor.md`](api-portal-proveedor.md).
+
 ## Aún sin pantalla en el frontend
 `/favoritos`, `/negocios/cercanos`, `/auth/me`, `PUT/DELETE /negocios`, `POST /resenas`. Existen en este backend por si se necesitan.
