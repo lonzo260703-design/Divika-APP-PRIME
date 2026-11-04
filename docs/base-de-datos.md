@@ -13,6 +13,7 @@ erDiagram
   usuarios {
     int id PK
     string nombre
+    string apellidos "solo proveedores"
     string email UK
     string passwordHash "nulo si entra con Google/Apple"
     string rol "cliente | negocio"
@@ -28,11 +29,17 @@ erDiagram
     int id PK
     string nombre
     string rfc UK
-    string descripcionCorta
+    string descripcionCorta "para las cards"
+    string descripcion "perfil, max 600 caracteres"
     string categoria
     string subcategoria "opcional, debe pertenecer a la categoria"
     string telefono
     string direccion
+    string ciudad
+    string colonia
+    string whatsapp
+    string emailPublico
+    string estado "en_proceso | publicado | pausado; solo publicado sale en el directorio"
     float latitud
     float longitud
     json horariosJson
@@ -53,6 +60,14 @@ erDiagram
     int negocioId FK
     date creadoEn
   }
+  interesados {
+    int id PK
+    string nombreNegocio
+    string servicio
+    string telefono
+    string ciudad
+    date creadoEn
+  }
   favoritos {
     int id PK
     int usuarioId FK
@@ -60,5 +75,9 @@ erDiagram
     date creadoEn
   }
 ```
+
+`interesados` guarda los contactos del formulario "Únete gratis" de la landing (sin cuenta, sin relaciones).
+
+Las tablas del portal del proveedor que faltan (servicios, solicitudes y citas, mensajes, notificaciones, disponibilidad, formas de pago) están descritas por sus datos en [`api-portal-proveedor.md`](api-portal-proveedor.md).
 
 Al borrar un usuario o negocio se borran en cascada sus reseñas y favoritos; si se borra el dueño de un negocio, `ownerId` queda nulo.
