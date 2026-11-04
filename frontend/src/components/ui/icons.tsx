@@ -40,3 +40,19 @@ export const IconApple = () => (
 
 // "G" simple: cuadro blanco con la letra azul (el logo oficial de Google tiene reglas de uso propias)
 export const IconGoogle = () => <span className="icono-g" aria-hidden>G</span>;
+
+// Navegación y perfil
+export const IconHome = () => <Icono width="22" height="22"><path d="M3 11 12 3l9 8" /><path d="M5 10v10h14V10M10 20v-6h4v6" /></Icono>;
+export const IconCalendar = () => <Icono width="22" height="22"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18" /></Icono>;
+export const IconHeart = () => <Icono width="22" height="22"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z" /></Icono>;
+export const IconSearch = () => <Icono><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></Icono>;
+export const IconPin = () => <Icono width="14" height="14"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></Icono>;
+export const IconShield = () => <Icono><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z" /><path d="m9 12 2 2 4-4" /></Icono>;
+export const IconBell = () => <Icono><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4l2-2z" /><path d="M10 21h4" /></Icono>;
+export const IconCard = () => <Icono><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20M6 15h4" /></Icono>;
+export const IconHelp = () => <Icono><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.5" /></Icono>;
+export const IconFlag = () => <Icono><path d="M5 21V4M5 4h12l-2 4 2 4H5" /></Icono>;
+export const IconUsers = () => <Icono><circle cx="9" cy="8" r="3.5" /><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.5.6 4 2.5 4 5" /></Icono>;
+export const IconLogout = () => <Icono><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9" /></Icono>;
+export const IconTrash = () => <Icono><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></Icono>;
+export const IconChevron = () => <Icono width="16" height="16"><path d="m9 5 7 7-7 7" /></Icono>;

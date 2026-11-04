@@ -9,7 +9,8 @@
   --color-tinta: #1c1b3a;        /* texto */
   --color-primario: #2b2d6c;     /* azul marino: botones principales, enlaces */
   --color-acento: #ed5034;       /* naranja-rojo: "Ya tengo cuenta", pines del logo, avisos */
-  --color-categorias: #f2f3f5;   /* fondo de iconos y tarjetas claras */
+  --color-categorias: #f2f3f5;   /* fondo de buscador, casillas y barra inferior */
+  --color-rojo: #ff070b;         /* "Rápido y seguro" del banner */
   --color-gris: #eaeaea;         /* campos de texto y placeholders de imagen */
   --color-borde: #dcdce4;
   --color-cinta: #000000;        /* listón del número en las cards */
@@ -34,5 +35,4 @@
 
   /* Tipografía */
   --fuente: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --fuente-logo: 'Pacifico', 'Brush Script MT', cursive; /* provisional, hasta tener el logo en imagen */
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import '@fontsource-variable/inter';
-import '@fontsource/pacifico/latin-400.css';
 import '@/styles/tokens.css';
 import '@/styles/globals.css';
 

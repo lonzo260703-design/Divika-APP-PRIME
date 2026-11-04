@@ -5,6 +5,7 @@ import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { NegocioCard } from '@/components/negocio/NegocioCard';
 import { PromoBanner } from '@/components/home/PromoBanner';
 import { TopTenItem } from '@/components/negocio/TopTenItem';
+import { IconPin } from '@/components/ui/icons';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { api } from '@/lib/api';
 import type { Negocio } from '@/types';
@@ -43,7 +44,7 @@ export default function HomePage() {
       <CategoryGrid activa={categoria} onSelect={setCategoria} />
 
       <section>
-        <h2 className="seccion">Cerca de ti</h2>
+        <h2 className="seccion--cerca"><IconPin /> Cerca de ti…</h2>
         {error && <p className="form__error">{error}</p>}
         {!error && negocios.length === 0 && <p className="texto-aparte">No encontramos negocios con esa búsqueda.</p>}
         <div className="carrusel">
