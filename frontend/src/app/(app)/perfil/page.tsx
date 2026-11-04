@@ -59,7 +59,7 @@ export default function PerfilPage() {
 
   return (
     <>
-      <div className="perfil-cabecera">
+      <div className="cabecera">
         <Atras href="/home" />
         <h1 className="titulo">Perfil</h1>
       </div>

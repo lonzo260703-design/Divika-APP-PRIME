@@ -7,6 +7,7 @@ import { cx } from '@/lib/cx';
  *
  *   <Card variant="overlay">   ← imagen de fondo + texto encima (Top 10)
  *   <Card variant="stack">     ← imagen arriba + texto abajo   (Cerca de ti)
+ *   <Card variant="grid">      ← versión compacta para cuadrícula de 2 columnas (listado por categoría)
  *     <Card.Image src="..." />
  *     <Card.Overlay />         ← degradado oscuro (solo overlay)
  *     <Card.Badge number={1} /> ← listón negro con número
@@ -21,7 +22,7 @@ import { cx } from '@/lib/cx';
 
 type DivProps = HTMLAttributes<HTMLDivElement>;
 
-type CardProps = DivProps & { variant?: 'overlay' | 'stack' };
+type CardProps = DivProps & { variant?: 'overlay' | 'stack' | 'grid' };
 
 export function Card({ variant = 'overlay', className, ...props }: CardProps) {
   return <div className={cx('card', `card--${variant}`, className)} {...props} />;

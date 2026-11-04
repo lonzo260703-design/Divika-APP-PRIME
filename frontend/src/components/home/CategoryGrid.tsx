@@ -1,22 +1,15 @@
-import { CATEGORIAS } from '@/lib/categorias';
-import { cx } from '@/lib/cx';
-import { ICONOS_CATEGORIA } from './categoriaIconos';
+import type { CategoriaInfo } from '@/types';
+import { ICONO_GENERICO, ICONOS_CATEGORIA } from './categoriaIconos';
 
-type Props = { activa: string | null; onSelect: (slug: string | null) => void };
+type Props = { categorias: CategoriaInfo[]; onSelect: (slug: string) => void };
 
-// Casillas en dos filas con desplazamiento horizontal. Tocar una filtra; tocarla otra vez quita el filtro.
-export function CategoryGrid({ activa, onSelect }: Props) {
+// Casillas en dos filas con desplazamiento horizontal. Al tocar una se abre su listado.
+export function CategoryGrid({ categorias, onSelect }: Props) {
   return (
     <div className="categorias">
-      {CATEGORIAS.map((c) => (
-        <button
-          key={c.slug}
-          type="button"
-          aria-pressed={activa === c.slug}
-          className={cx('categorias__item', activa === c.slug && 'categorias__item--activa')}
-          onClick={() => onSelect(activa === c.slug ? null : c.slug)}
-        >
-          {ICONOS_CATEGORIA[c.slug]}
+      {categorias.map((c) => (
+        <button key={c.slug} type="button" className="categorias__item" onClick={() => onSelect(c.slug)}>
+          {ICONOS_CATEGORIA[c.slug] ?? ICONO_GENERICO}
           <span className="categorias__nombre">{c.nombre}</span>
         </button>
       ))}

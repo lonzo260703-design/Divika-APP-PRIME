@@ -1,12 +1,25 @@
-// Mantener sincronizado con backend/src/negocios/categorias.ts
-// El orden es el de la pantalla (dos filas, se llenan por columnas). Los iconos de línea están en components/home/categoriaIconos.tsx
-export const CATEGORIAS = [
-  { slug: 'alimentos', nombre: 'Restaurantes', icono: '🍎' },
-  { slug: 'hogar', nombre: 'Servicios para el hogar', icono: '🏠' },
-  { slug: 'bienestar', nombre: 'Bienestar', icono: '🌿' },
-  { slug: 'fitness', nombre: 'Fitness', icono: '🏋️' },
-  { slug: 'autos', nombre: 'Autos', icono: '🚗' },
-  { slug: 'estetica', nombre: 'Estética', icono: '✂️' },
-  { slug: 'laboratorios', nombre: 'Laboratorios', icono: '🧪' },
-  { slug: 'tecnologia', nombre: 'Tecnología', icono: '📱' },
-] as const;
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { CategoriaInfo } from '@/types';
+import { api } from './api';
+
+// Las categorías viven en el backend (GET /categorias); aquí se piden una sola vez y se reutilizan
+let cache: CategoriaInfo[] | null = null;
+
+export function useCategorias() {
+  const [categorias, setCategorias] = useState<CategoriaInfo[]>(cache ?? []);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (cache) return;
+    api<CategoriaInfo[]>('/categorias')
+      .then((datos) => {
+        cache = datos;
+        setCategorias(datos);
+      })
+      .catch(() => setError(true));
+  }, []);
+
+  return { categorias, cargando: categorias.length === 0 && !error, error };
+}

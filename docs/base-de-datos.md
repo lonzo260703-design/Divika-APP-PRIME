@@ -30,6 +30,7 @@ erDiagram
     string rfc UK
     string descripcionCorta
     string categoria
+    string subcategoria "opcional, debe pertenecer a la categoria"
     string telefono
     string direccion
     float latitud

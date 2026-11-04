@@ -18,6 +18,7 @@ export type Negocio = {
   nombre: string;
   descripcionCorta: string | null;
   categoria: string;
+  subcategoria: string | null;
   telefono: string;
   direccion: string;
   latitud: number | null;
@@ -30,7 +31,12 @@ export type Negocio = {
   clicsWhatsapp: number;
   clicsLlamada: number;
   creadoEn: string;
+  // Solo viene en GET /negocios (null si no se mandó la ubicación)
+  distanciaKm?: number | null;
 };
+
+// GET /categorias
+export type CategoriaInfo = { slug: string; nombre: string; subcategorias: string[] };
 
 // GET /negocios/cercanos
 export type NegocioCercano = Negocio & { distanciaKm: number | null };
