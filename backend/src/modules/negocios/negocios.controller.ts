@@ -7,9 +7,24 @@ import { JwtAuthGuard } from '../../common/jwt-auth.guard';
 export class NegociosController {
   constructor(private service: NegociosService) {}
 
+  // Filtros: buscar (nombre), categoria, subcategoria. orden=distancia necesita lat y lng (si no, va por calificación)
   @Get()
-  listar(@Query('buscar') buscar?: string, @Query('categoria') categoria?: string) {
-    return this.service.listar(buscar, categoria);
+  listar(
+    @Query('buscar') buscar?: string,
+    @Query('categoria') categoria?: string,
+    @Query('subcategoria') subcategoria?: string,
+    @Query('orden') orden?: string,
+    @Query('lat') lat?: string,
+    @Query('lng') lng?: string,
+  ) {
+    return this.service.listar({
+      buscar,
+      categoria,
+      subcategoria,
+      orden: orden === 'distancia' ? 'distancia' : 'calificacion',
+      lat: lat !== undefined ? parseFloat(lat) : undefined,
+      lng: lng !== undefined ? parseFloat(lng) : undefined,
+    });
   }
 
   @Get('top')

@@ -6,8 +6,12 @@ export class CrearNegocioDto {
   @IsNotEmpty({ message: 'El nombre del negocio es obligatorio' })
   nombre: string;
 
-  @IsIn(CATEGORIAS as unknown as string[], { message: 'Elige una categoría válida' })
+  @IsIn(CATEGORIAS, { message: 'Elige una categoría válida' })
   categoria: string;
+
+  @IsOptional()
+  @IsString()
+  subcategoria?: string;
 
   @Matches(/^[0-9+()\-\s]{7,20}$/, { message: 'Teléfono no válido' })
   telefono: string;
@@ -49,8 +53,12 @@ export class ActualizarNegocioDto {
   nombre?: string;
 
   @IsOptional()
-  @IsIn(CATEGORIAS as unknown as string[], { message: 'Elige una categoría válida' })
+  @IsIn(CATEGORIAS, { message: 'Elige una categoría válida' })
   categoria?: string;
+
+  @IsOptional()
+  @IsString()
+  subcategoria?: string;
 
   @IsOptional()
   @Matches(/^[0-9+()\-\s]{7,20}$/, { message: 'Teléfono no válido' })

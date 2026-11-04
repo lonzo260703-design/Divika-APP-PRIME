@@ -19,6 +19,9 @@ export class Negocio {
   @Column()
   categoria: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  subcategoria: string | null;
+
   @Column()
   telefono: string;
 

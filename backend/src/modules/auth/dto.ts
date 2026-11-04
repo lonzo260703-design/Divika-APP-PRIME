@@ -38,8 +38,12 @@ export class RegistroNegocioDto {
   @IsNotEmpty({ message: 'El nombre del local es obligatorio' })
   nombreLocal: string;
 
-  @IsIn(CATEGORIAS as unknown as string[], { message: 'Elige una categoría válida' })
+  @IsIn(CATEGORIAS, { message: 'Elige una categoría válida' })
   categoria: string;
+
+  @IsOptional()
+  @IsString()
+  subcategoria?: string;
 
   @Matches(/^[0-9+()\-\s]{7,20}$/, { message: 'Teléfono no válido' })
   telefono: string;

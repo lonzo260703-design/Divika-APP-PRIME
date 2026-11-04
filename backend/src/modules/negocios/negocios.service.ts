@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException, ForbiddenException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Negocio } from './negocio.entity';
 import { CrearNegocioDto, ActualizarNegocioDto } from './dto';
 import { Usuario } from '../usuarios/usuario.entity';
+import { CATEGORIAS_ANTERIORES, subcategoriaValida } from './categorias';
+import { CENTRO, NEGOCIOS_EJEMPLO } from './negocios.seed';
 
 const img = (n: number) => `https://picsum.photos/seed/divika${n}/300/400`;
 
@@ -12,17 +14,12 @@ export class NegociosService implements OnModuleInit {
   constructor(@InjectRepository(Negocio) private repo: Repository<Negocio>) {}
 
   async onModuleInit() {
+    // Bases creadas con la primera lista de categorías: las pasamos a su equivalente actual
+    for (const [viejo, nuevo] of Object.entries(CATEGORIAS_ANTERIORES)) {
+      await this.repo.update({ categoria: viejo }, { categoria: nuevo });
+    }
+
     if ((await this.repo.count()) > 0) return;
-    const ejemplos = [
-      ['Salón Estilo', 'estetica', '4421112233', 'Av. Principal 123', 4.5, 24.0277, -104.6532],
-      ['Taller Mecánico Rojas', 'autos', '4422223344', 'Calle Hidalgo 45', 4.8, 24.0290, -104.6550],
-      ['Gimnasio Fit', 'fitness', '4423334455', 'Blvd. Dolores 89', 4.2, 24.0250, -104.6500],
-      ['Laboratorio Médico Central', 'laboratorios', '4424445566', 'Calle 5 de Mayo 10', 4.9, 24.0300, -104.6600],
-      ['Cafetería La Hoja', 'alimentos', '4425556677', 'Calle Morelos 7', 4.6, 24.0260, -104.6520],
-      ['Cel Express', 'tecnologia', '4426667788', 'Av. Juárez 300', 4.1, 24.0280, -104.6540],
-      ['Ferretería El Clavo', 'hogar', '4427778899', 'Calle Allende 22', 4.3, 24.0310, -104.6480],
-      ['Spa Equilibrio', 'bienestar', '4428889900', 'Av. Reforma 150', 4.7, 24.0240, -104.6580],
-    ] as const;
 
     const horariosEjemplo = {
       lunes: { apertura: '09:00', cierre: '19:00', cerrado: false },
@@ -35,15 +32,17 @@ export class NegociosService implements OnModuleInit {
     };
 
     await this.repo.save(
-      ejemplos.map(([nombre, categoria, telefono, direccion, calificacion, latitud, longitud], i) =>
+      NEGOCIOS_EJEMPLO.map(([nombre, categoria, subcategoria, calificacion, km], i) =>
         this.repo.create({
           nombre,
           categoria,
-          telefono,
-          direccion,
+          subcategoria,
+          telefono: `618${String(1000000 + i * 1373).slice(0, 7)}`,
+          direccion: `Av. 20 de Noviembre ${100 + i * 7}`,
           calificacion,
-          latitud,
-          longitud,
+          // Hacia el norte o hacia el este del centro, para que la distancia coincida con la del diseño
+          latitud: CENTRO.lat + (i % 2 === 0 ? km / 111 : 0),
+          longitud: CENTRO.lng + (i % 2 === 1 ? km / (111 * Math.cos((CENTRO.lat * Math.PI) / 180)) : 0),
           horariosJson: horariosEjemplo,
           imagenUrl: img(i + 1),
         }),
@@ -51,11 +50,32 @@ export class NegociosService implements OnModuleInit {
     );
   }
 
-  listar(buscar?: string, categoria?: string) {
-    const qb = this.repo.createQueryBuilder('n').orderBy('n.calificacion', 'DESC');
-    if (buscar) qb.andWhere('LOWER(n.nombre) LIKE :buscar', { buscar: `%${buscar.toLowerCase()}%` });
-    if (categoria) qb.andWhere('n.categoria = :categoria', { categoria });
-    return qb.getMany();
+  async listar(f: {
+    buscar?: string;
+    categoria?: string;
+    subcategoria?: string;
+    orden?: 'calificacion' | 'distancia';
+    lat?: number;
+    lng?: number;
+  }) {
+    const qb = this.repo.createQueryBuilder('n').orderBy('n.calificacion', 'DESC').addOrderBy('n.nombre', 'ASC');
+    if (f.buscar) qb.andWhere('LOWER(n.nombre) LIKE :buscar', { buscar: `%${f.buscar.toLowerCase()}%` });
+    if (f.categoria) qb.andWhere('n.categoria = :categoria', { categoria: f.categoria });
+    if (f.subcategoria) qb.andWhere('n.subcategoria = :subcategoria', { subcategoria: f.subcategoria });
+
+    const negocios = await qb.getMany();
+    const hayUbicacion = Number.isFinite(f.lat) && Number.isFinite(f.lng);
+    const conDistancia = negocios.map((n) => ({
+      ...n,
+      distanciaKm:
+        hayUbicacion && n.latitud !== null && n.longitud !== null
+          ? this.calcularDistanciaHaversine(f.lat as number, f.lng as number, n.latitud, n.longitud)
+          : null,
+    }));
+    if (f.orden === 'distancia' && hayUbicacion) {
+      conDistancia.sort((a, b) => (a.distanciaKm ?? Infinity) - (b.distanciaKm ?? Infinity));
+    }
+    return conDistancia;
   }
 
   top(cantidad = 10) {
@@ -76,6 +96,9 @@ export class NegociosService implements OnModuleInit {
   }
 
   async crear(dto: CrearNegocioDto, owner?: Usuario) {
+    if (!subcategoriaValida(dto.categoria, dto.subcategoria)) {
+      throw new BadRequestException('Esa subcategoría no pertenece a la categoría elegida');
+    }
     const nuevoNegocio = this.repo.create({
       ...dto,
       owner: owner || null,
@@ -91,6 +114,9 @@ export class NegociosService implements OnModuleInit {
       throw new ForbiddenException('No tienes permisos para modificar este negocio');
     }
 
+    if (!subcategoriaValida(dto.categoria ?? negocio.categoria, dto.subcategoria ?? negocio.subcategoria)) {
+      throw new BadRequestException('Esa subcategoría no pertenece a la categoría elegida');
+    }
     Object.assign(negocio, dto);
     return await this.repo.save(negocio);
   }

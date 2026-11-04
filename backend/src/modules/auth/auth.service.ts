@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { isEmail } from 'class-validator';
 import { DataSource } from 'typeorm';
+import { subcategoriaValida } from '../negocios/categorias';
 import { Negocio } from '../negocios/negocio.entity';
 import { Usuario } from '../usuarios/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
@@ -42,6 +43,9 @@ export class AuthService {
   // si algo falla, no se guarda ninguno de los dos.
   async registrarNegocio(dto: RegistroNegocioDto) {
     await this.verificarEmailLibre(dto.email);
+    if (!subcategoriaValida(dto.categoria, dto.subcategoria)) {
+      throw new BadRequestException('Esa subcategoría no pertenece a la categoría elegida');
+    }
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const usuario = await this.dataSource.transaction(async (m) => {
       const nuevo = await m.save(
@@ -51,6 +55,7 @@ export class AuthService {
         m.create(Negocio, {
           nombre: dto.nombreLocal,
           categoria: dto.categoria,
+          subcategoria: dto.subcategoria || null,
           telefono: dto.telefono,
           direccion: dto.direccion,
           horario: dto.horario?.trim() || null,
