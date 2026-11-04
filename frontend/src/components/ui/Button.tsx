@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ButtonHTMLAttributes, ComponentProps } from 'react';
 import { cx } from '@/lib/cx';
 
-type Variante = 'primary' | 'secondary';
+type Variante = 'primary' | 'secondary' | 'accent' | 'apple' | 'google' | 'sms';
 
 export function Button({
   variant = 'primary',

@@ -18,7 +18,7 @@ export function LoginForm() {
       <Field label="Correo electrónico" name="email" type="email" required autoComplete="email" />
       <Field label="Contraseña" name="password" type="password" required autoComplete="current-password" />
       {error && <p className="form__error">{error}</p>}
-      <Button type="submit" disabled={cargando}>
+      <Button type="submit" className="btn--block" disabled={cargando}>
         {cargando ? 'Entrando…' : 'Iniciar sesión'}
       </Button>
     </form>

@@ -5,12 +5,16 @@ Base: `http://localhost:3001`. Rutas con 🔒 requieren `Authorization: Bearer <
 ## Auth
 | Método | Ruta | Descripción |
 |---|---|---|
-| POST | `/auth/registro/cliente` | Crea cuenta de cliente |
+| POST | `/auth/registro/cliente` | `{ nombre, email, telefono (10 dígitos), password }`. No verifica el teléfono: eso se hace con el código |
 | POST | `/auth/registro/negocio` | Crea usuario y negocio en una transacción |
-| POST | `/auth/login` | Devuelve `{ token, usuario }` |
+| POST | `/auth/login` | Correo y contraseña. Devuelve `{ token, usuario }` |
+| POST | `/auth/codigo/enviar` | `{ canal: 'sms' \| 'email', destino }`. Genera un código de 4 dígitos. Responde igual exista o no la cuenta. Un envío por minuto (429 si se repite antes) |
+| POST | `/auth/codigo/verificar` | `{ canal, destino, codigo }`. Si es correcto devuelve `{ token, usuario }` (y marca el teléfono como verificado en `sms`). Vigencia 10 min, máximo 5 intentos |
 | GET 🔒 | `/auth/me` | Perfil del usuario |
-| POST | `/auth/google`, `/auth/apple` | **Simulados**: no validan el token, no usar en producción |
-| POST 🔒 | `/auth/otp/enviar`, `/auth/otp/verificar` | Verificación de teléfono; el código solo se imprime en consola |
+| POST 🔒 | `/auth/otp/enviar`, `/auth/otp/verificar` | Verificar un teléfono con la sesión ya iniciada (mismas reglas del código) |
+| POST | `/auth/google`, `/auth/apple` | **Desactivados** (501) hasta validar el token con la librería oficial de cada proveedor |
+
+**Códigos:** solo se guarda su hash. Todavía no hay proveedor de SMS ni de correo: el código se imprime en la consola del backend (`[CÓDIGO SIMULADO] ...`). Para producción, conectar Twilio (SMS) o un servicio de correo en `AuthService.emitirCodigo`.
 
 ## Negocios
 | Método | Ruta | Descripción |

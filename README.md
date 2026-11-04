@@ -27,6 +27,8 @@ npm run dev
 
 Abre http://localhost:3000. La base (`backend/divika.sqlite`) se crea sola con 8 negocios de ejemplo.
 
+**Códigos de verificación:** aún no se envían por SMS ni correo. Al pedir un código, búscalo en la terminal del backend (`[CÓDIGO SIMULADO] Código para ...: 1234`).
+
 ## Dónde cambiar cosas
 
 | Quiero cambiar…                 | Archivo |

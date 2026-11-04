@@ -18,6 +18,9 @@ export class RegistroClienteDto {
   @IsEmail({}, { message: 'Correo no válido' })
   email: string;
 
+  @Matches(/^\d{10}$/, { message: 'Teléfono inválido. Escribe los 10 dígitos de tu número' })
+  telefono: string;
+
   @IsString()
   @MinLength(8, { message: 'La contraseña debe tener mínimo 8 caracteres' })
   password: string;
@@ -85,5 +88,24 @@ export class VerificarOtpDto {
 
   @IsString()
   @IsNotEmpty({ message: 'El código OTP es obligatorio' })
+  codigo: string;
+}
+
+// ==========================================
+// ACCESO POR CÓDIGO (SMS o correo), sin sesión previa
+// ==========================================
+
+export class EnviarCodigoDto {
+  @IsIn(['sms', 'email'], { message: 'El canal debe ser sms o email' })
+  canal: 'sms' | 'email';
+
+  // Teléfono (10 dígitos, se aceptan espacios y +52) o correo, según el canal
+  @IsString()
+  @IsNotEmpty({ message: 'Escribe tu teléfono o correo' })
+  destino: string;
+}
+
+export class VerificarCodigoDto extends EnviarCodigoDto {
+  @Matches(/^\d{4}$/, { message: 'El código tiene 4 dígitos' })
   codigo: string;
 }

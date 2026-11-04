@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 // MODIFICACIÓN: Importamos los nuevos DTOs necesarios para los endpoints de Google, Apple y OTP
-import { LoginDto, RegistroClienteDto, RegistroNegocioDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto } from './dto';
+import { LoginDto, RegistroClienteDto, RegistroNegocioDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto, EnviarCodigoDto, VerificarCodigoDto } from './dto';
 import { JwtAuthGuard } from '../../common/jwt-auth.guard';
 
 @Controller('auth')
@@ -21,6 +21,17 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.service.login(dto);
+  }
+
+  // Acceso por código: pedir y verificar (no requieren sesión)
+  @Post('codigo/enviar')
+  enviarCodigo(@Body() dto: EnviarCodigoDto) {
+    return this.service.enviarCodigo(dto);
+  }
+
+  @Post('codigo/verificar')
+  verificarCodigo(@Body() dto: VerificarCodigoDto) {
+    return this.service.verificarCodigo(dto);
   }
 
   @UseGuards(JwtAuthGuard)

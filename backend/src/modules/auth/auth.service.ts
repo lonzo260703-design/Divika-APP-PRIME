@@ -1,12 +1,18 @@
-import { ConflictException, Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { randomInt } from 'crypto';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { isEmail } from 'class-validator';
 import { DataSource } from 'typeorm';
 import { Negocio } from '../negocios/negocio.entity';
 import { Usuario } from '../usuarios/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
 // MODIFICACIÓN: Importamos los nuevos DTOs creados en el paso anterior
-import { LoginDto, RegistroClienteDto, RegistroNegocioDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto } from './dto';
+import { LoginDto, RegistroClienteDto, RegistroNegocioDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto, EnviarCodigoDto, VerificarCodigoDto } from './dto';
+
+const INTENTOS_MAX = 5;
+const ESPERA_REENVIO_SEG = 60;
+const VIGENCIA_CODIGO_MIN = 10;
 
 @Injectable()
 export class AuthService {
@@ -18,8 +24,13 @@ export class AuthService {
 
   async registrarCliente(dto: RegistroClienteDto) {
     await this.verificarEmailLibre(dto.email);
+    const telefono = this.normalizarTelefono(dto.telefono);
+    if (await this.usuarios.buscarPorTelefono(telefono)) {
+      throw new ConflictException('Ese teléfono ya está registrado');
+    }
     const usuario = await this.usuarios.crear({
       nombre: dto.nombre,
+      telefono,
       email: dto.email.toLowerCase(),
       passwordHash: await bcrypt.hash(dto.password, 10),
       rol: 'cliente',
@@ -89,116 +100,127 @@ export class AuthService {
   }
 
   // ==========================================
-  // NUEVOS MÉTODOS AÑADIDOS PARA GOOGLE, APPLE Y OTP:
+  // ACCESO POR CÓDIGO (SMS o correo)
   // ==========================================
 
-  // MODIFICACIÓN: Autenticación o registro mediante Google OAuth
-  async loginGoogle(dto: GoogleLoginDto) {
-    // Nota: Aquí deberías validar el token con la librería oficial de Google (ej. google-auth-library).
-    // Por simplicidad y estructura base, simulamos la extracción del email y nombre desde el token o payload decodificado.
-    // Ejemplo real: const ticket = await googleClient.verifyIdToken({ idToken: dto.token }); const payload = ticket.getPayload();
-    
-    // Simulación de datos extraídos (en producción usa la librería de Google):
-    const emailSimulado = "usuario.google@ejemplo.com"; 
-    const nombreSimulado = "Usuario Google";
-    const googleIdSimulado = dto.token; // Usar el ID real que provea Google
-
-    let usuario = await this.usuarios.buscarPorGoogleId(googleIdSimulado);
-    if (!usuario) {
-      // Si no existe por googleId, revisamos si ya existe por email
-      usuario = await this.usuarios.buscarPorEmail(emailSimulado);
-      if (usuario) {
-        // Asociamos Google ID a la cuenta existente
-        await this.usuarios.actualizar(usuario.id, { googleId: googleIdSimulado });
-      } else {
-        // Creamos nuevo usuario
-        usuario = await this.usuarios.crear({
-          nombre: nombreSimulado,
-          email: emailSimulado.toLowerCase(),
-          googleId: googleIdSimulado,
-          rol: 'cliente',
-          passwordHash: null as any,
-        });
-      }
+  // Pide un código de 4 dígitos. Responde igual exista o no la cuenta, para no revelar quién está registrado.
+  async enviarCodigo(dto: EnviarCodigoDto) {
+    const usuario = await this.buscarPorDestino(dto);
+    if (usuario) {
+      await this.emitirCodigo(usuario, dto.destino);
+    } else {
+      console.log(`[CÓDIGO SIMULADO] No hay una cuenta con ${dto.destino}; no se envió nada`);
     }
-    return this.respuesta(usuario);
+    return { enviado: true, segundosEspera: ESPERA_REENVIO_SEG };
   }
 
-  // MODIFICACIÓN: Autenticación o registro mediante Apple Sign-In
-  async loginApple(dto: AppleLoginDto) {
-    // Nota: Aquí se validaría el token JWT de Apple usando apple-auth o jsonwebtoken con las llaves públicas de Apple.
-    const emailSimulado = "usuario.apple@ejemplo.com";
-    const nombreSimulado = dto.nombre || "Usuario Apple";
-    const appleIdSimulado = dto.token; // Usar el ID único real de Apple
-
-    let usuario = await this.usuarios.buscarPorAppleId(appleIdSimulado);
-    if (!usuario) {
-      usuario = await this.usuarios.buscarPorEmail(emailSimulado);
-      if (usuario) {
-        await this.usuarios.actualizar(usuario.id, { appleId: appleIdSimulado });
-      } else {
-        usuario = await this.usuarios.crear({
-          nombre: nombreSimulado,
-          email: emailSimulado.toLowerCase(),
-          appleId: appleIdSimulado,
-          rol: 'cliente',
-          passwordHash: null as any,
-        });
-      }
-    }
-    return this.respuesta(usuario);
+  // Valida el código y, si es correcto, inicia sesión (devuelve token + usuario)
+  async verificarCodigo(dto: VerificarCodigoDto) {
+    const usuario = await this.buscarPorDestino(dto);
+    if (!usuario) throw new BadRequestException('Código incorrecto');
+    await this.comprobarCodigo(usuario, dto.codigo);
+    const actualizado = dto.canal === 'sms'
+      ? await this.usuarios.actualizar(usuario.id, { telefonoVerificado: true })
+      : usuario;
+    return this.respuesta(actualizado ?? usuario);
   }
 
-  // MODIFICACIÓN: Enviar código OTP por SMS / WhatsApp
+  // Quita espacios, guiones y el prefijo +52 / 52 / 521: deja solo los 10 dígitos
+  private normalizarTelefono(telefono: string) {
+    let d = telefono.replace(/\D/g, '');
+    if (d.length === 13 && d.startsWith('521')) d = d.slice(3);
+    else if (d.length === 12 && d.startsWith('52')) d = d.slice(2);
+    return d;
+  }
+
+  private async buscarPorDestino({ canal, destino }: EnviarCodigoDto) {
+    if (canal === 'email') {
+      if (!isEmail(destino.trim())) throw new BadRequestException('Correo no válido');
+      return this.usuarios.buscarPorEmail(destino.trim());
+    }
+    const telefono = this.normalizarTelefono(destino);
+    if (!/^\d{10}$/.test(telefono)) {
+      throw new BadRequestException('Teléfono inválido. Verifica que el número sea correcto');
+    }
+    return this.usuarios.buscarPorTelefono(telefono);
+  }
+
+  // Genera el código, guarda solo su hash y lo "envía". Limita reenvíos a uno por minuto.
+  private async emitirCodigo(usuario: Usuario, destinoLog: string) {
+    if (usuario.otpEnviadoEn) {
+      const pasaron = (Date.now() - new Date(usuario.otpEnviadoEn).getTime()) / 1000;
+      if (pasaron < ESPERA_REENVIO_SEG) {
+        const faltan = Math.ceil(ESPERA_REENVIO_SEG - pasaron);
+        throw new HttpException(`Puedes pedir otro código en ${faltan} segundos`, HttpStatus.TOO_MANY_REQUESTS);
+      }
+    }
+    const codigo = randomInt(0, 10000).toString().padStart(4, '0');
+    await this.usuarios.actualizar(usuario.id, {
+      codigoOtp: await bcrypt.hash(codigo, 8),
+      otpExpiraEn: new Date(Date.now() + VIGENCIA_CODIGO_MIN * 60 * 1000),
+      otpIntentos: 0,
+      otpEnviadoEn: new Date(),
+    });
+    // INTEGRACIÓN CON PROVEEDOR (Twilio para SMS/WhatsApp, o correo): se enviaría aquí.
+    // Por ahora el código solo se imprime en la consola del backend.
+    console.log(`[CÓDIGO SIMULADO] Código para ${destinoLog}: ${codigo}`);
+  }
+
+  // Revisa vigencia, intentos y coincidencia; si todo está bien, consume el código
+  private async comprobarCodigo(usuario: Usuario, codigo: string) {
+    if (!usuario.codigoOtp || !usuario.otpExpiraEn || new Date() > new Date(usuario.otpExpiraEn)) {
+      throw new BadRequestException('El código expiró. Solicita uno nuevo');
+    }
+    if (usuario.otpIntentos >= INTENTOS_MAX) {
+      throw new BadRequestException('Demasiados intentos. Solicita un código nuevo');
+    }
+    if (!(await bcrypt.compare(codigo, usuario.codigoOtp))) {
+      await this.usuarios.actualizar(usuario.id, { otpIntentos: usuario.otpIntentos + 1 });
+      throw new BadRequestException('Código incorrecto');
+    }
+    await this.usuarios.actualizar(usuario.id, {
+      codigoOtp: null as any,
+      otpExpiraEn: null as any,
+      otpIntentos: 0,
+    });
+  }
+
+  // ==========================================
+  // GOOGLE Y APPLE: PENDIENTES
+  // ==========================================
+  // Antes estaban simulados (aceptaban cualquier token y entraban a una cuenta fija), lo que permitía
+  // iniciar sesión sin credenciales. Quedan desactivados hasta validar el token con la librería oficial
+  // (google-auth-library / verificación del JWT de Apple).
+
+  loginGoogle(_dto: GoogleLoginDto): never {
+    throw new NotImplementedException('Inicio de sesión con Google disponible próximamente');
+  }
+
+  loginApple(_dto: AppleLoginDto): never {
+    throw new NotImplementedException('Inicio de sesión con Apple disponible próximamente');
+  }
+
+  // ==========================================
+  // VERIFICAR TELÉFONO CON SESIÓN YA INICIADA (OTP)
+  // ==========================================
+
   async enviarOtp(userId: number, dto: EnviarOtpDto) {
     const usuario = await this.usuarios.buscarPorId(userId);
     if (!usuario) throw new UnauthorizedException('Usuario no encontrado');
-
-    // Generar código aleatorio de 6 dígitos
-    const codigoOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    // Expiración en 10 minutos
-    const otpExpiraEn = new Date(Date.now() + 10 * 60 * 1000);
-
-    // Guardar teléfono y código en el usuario
-    await this.usuarios.actualizar(userId, {
-      telefono: dto.telefono,
-      codigoOtp,
-      otpExpiraEn,
-      telefonoVerificado: false,
-    });
-
-    // INTEGRACIÓN CON PROVEEDOR DE SMS/WHATSAPP (ej. Twilio):
-    // Aquí puedes integrar tu cliente de Twilio o servicio de mensajería:
-    // await twilioClient.messages.create({ body: `Tu código Divika es: ${codigoOtp}`, from: '...', to: dto.telefono });
-    console.log(`[OTP SIMULADO] Código para ${dto.telefono}: ${codigoOtp}`);
-
-    return { mensaje: 'Código OTP enviado correctamente al teléfono' };
+    const telefono = this.normalizarTelefono(dto.telefono);
+    const actualizado = await this.usuarios.actualizar(userId, { telefono, telefonoVerificado: false });
+    await this.emitirCodigo(actualizado ?? usuario, telefono);
+    return { mensaje: 'Código enviado correctamente al teléfono', segundosEspera: ESPERA_REENVIO_SEG };
   }
 
-  // MODIFICACIÓN: Verificar el código OTP ingresado por el usuario
   async verificarOtp(userId: number, dto: VerificarOtpDto) {
     const usuario = await this.usuarios.buscarPorId(userId);
     if (!usuario) throw new UnauthorizedException('Usuario no encontrado');
-
-    if (usuario.telefono !== dto.telefono) {
+    if (usuario.telefono !== this.normalizarTelefono(dto.telefono)) {
       throw new BadRequestException('El número de teléfono no coincide con la solicitud');
     }
-
-    if (!usuario.codigoOtp || usuario.codigoOtp !== dto.codigo) {
-      throw new BadRequestException('Código OTP incorrecto');
-    }
-
-    if (usuario.otpExpiraEn && new Date() > new Date(usuario.otpExpiraEn)) {
-      throw new BadRequestException('El código OTP ha expirado');
-    }
-
-    // Marcar teléfono como verificado y limpiar el código temporal
-    await this.usuarios.actualizar(userId, {
-      telefonoVerificado: true,
-      codigoOtp: null as any,
-      otpExpiraEn: null as any,
-    });
-
+    await this.comprobarCodigo(usuario, dto.codigo);
+    await this.usuarios.actualizar(userId, { telefonoVerificado: true });
     return { mensaje: 'Teléfono verificado correctamente', telefonoVerificado: true };
   }
 }

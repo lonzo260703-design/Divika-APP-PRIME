@@ -37,8 +37,15 @@ export class Usuario {
   telefonoVerificado: boolean;
 
   // MODIFICACIÓN: Código OTP temporal y su fecha de expiración para la validación del teléfono
+  // Hash (bcrypt) del código de 4 dígitos; nunca se guarda el código en claro
   @Column({ nullable: true })
   codigoOtp: string;
+
+  @Column({ type: 'int', default: 0 })
+  otpIntentos: number;
+
+  @Column({ type: Date, nullable: true })
+  otpEnviadoEn: Date;
 
   @Column({ type: Date, nullable: true }) // type: Date funciona en SQLite, Postgres y MySQL
   otpExpiraEn: Date;

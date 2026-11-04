@@ -1,24 +1,28 @@
 /* ============================================================
    TODO EL ESTILO SE CAMBIA AQUÍ. Toca estos valores y cambia
-   toda la app. Colores tomados de tu plantilla de Figma.
+   toda la app. Colores tomados de las capturas del diseño en Figma.
    ============================================================ */
 :root {
   /* Colores */
-  --color-fondo: #f7f7f9;        /* fondo de pantallas */
+  --color-fondo: #ffffff;        /* fondo de pantallas */
   --color-superficie: #ffffff;   /* tarjetas, inputs */
-  --color-tinta: #1f1d3d;        /* texto y bordes */
-  --color-primario: #6b6a9c;     /* botón principal */
-  --color-acento: #f26b3a;       /* naranja de los pines del logo */
-  --color-categorias: #c4b5fd;   /* recuadro morado de iconos */
-  --color-gris: #dcdcdc;         /* placeholders de imagen */
+  --color-tinta: #1c1b3a;        /* texto */
+  --color-primario: #2b2d6c;     /* azul marino: botones principales, enlaces */
+  --color-acento: #ed5034;       /* naranja-rojo: "Ya tengo cuenta", pines del logo, avisos */
+  --color-categorias: #f2f3f5;   /* fondo de iconos y tarjetas claras */
+  --color-gris: #eaeaea;         /* campos de texto y placeholders de imagen */
+  --color-borde: #dcdce4;
   --color-cinta: #000000;        /* listón del número en las cards */
-  --color-error: #b3261e;
+  --color-error: #ed5034;
+  --color-apple: #000000;
+  --color-google: #4285f4;
+  --color-sms: #38c96a;
 
-  /* "Rudimentario": bordes gruesos, esquinas casi rectas, sombra dura.
-     Para suavizarlo: --borde con 1px, --radio 16px y --sombra none. */
-  --borde: 2px solid var(--color-tinta);
-  --radio: 4px;
-  --sombra: 3px 3px 0 var(--color-tinta);
+  /* Forma: suave (como el diseño). Para el estilo "rudimentario" anterior:
+     --borde: 2px solid var(--color-tinta); --radio: 4px; --sombra: 3px 3px 0 var(--color-tinta); */
+  --borde: 1px solid var(--color-borde);
+  --radio: 12px;
+  --sombra: 0 2px 8px rgba(28, 27, 58, 0.14);
 
   /* Espaciado */
   --espacio-1: 4px;
@@ -26,7 +30,9 @@
   --espacio-3: 12px;
   --espacio-4: 16px;
   --espacio-5: 24px;
+  --espacio-6: 32px;
 
   /* Tipografía */
-  --fuente: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fuente: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fuente-logo: 'Pacifico', 'Brush Script MT', cursive; /* provisional, hasta tener el logo en imagen */
 }
