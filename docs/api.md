@@ -48,3 +48,47 @@ Se editan en `backend/src/modules/negocios/categorias.ts`. El icono de cada una 
 | GET 🔒 | `/favoritos` | Negocios favoritos del usuario |
 | POST 🔒 | `/favoritos/:negocioId` | Agrega (idempotente) |
 | DELETE 🔒 | `/favoritos/:negocioId` | Quita |
+
+---
+
+# Contrato con el frontend
+
+Esta sección es para quien implemente el backend en otra tecnología (por ejemplo PostgreSQL). El frontend solo depende de esto; los tipos exactos están en `frontend/src/types/index.ts`.
+
+## Reglas generales
+- JSON en todo. Errores: HTTP 4xx con `{ "message": "texto" }` o `{ "message": ["texto1", "texto2"] }`. El frontend muestra ese `message` tal cual al usuario, así que debe venir en español.
+- Autenticación: `Authorization: Bearer <JWT>`. El token se guarda en el navegador.
+- CORS: debe permitir el origen del frontend (hoy `FRONTEND_URL`).
+- Fechas en ISO 8601. Calificaciones: número de 0 a 5.
+
+## Rutas que el frontend usa hoy
+| Pantalla | Ruta | Respuesta esperada |
+|---|---|---|
+| Registro | `POST /auth/registro/cliente`, `POST /auth/registro/negocio` | `{ token, usuario }` |
+| Login | `POST /auth/login` | `{ token, usuario }` |
+| Acceso por código | `POST /auth/codigo/enviar` | `{ enviado: boolean, segundosEspera: number }` |
+| Acceso por código | `POST /auth/codigo/verificar` | `{ token, usuario }` |
+| Inicio, categorías | `GET /categorias` | `[{ slug, nombre, subcategorias: string[] }]` |
+| Inicio, listado | `GET /negocios?buscar=&categoria=&subcategoria=&orden=&lat=&lng=` | `Negocio[]` (con `distanciaKm` si hay `lat` y `lng`) |
+| Inicio (Top 10) | `GET /negocios/top` | `Negocio[]` |
+| Detalle | `GET /negocios/:id` | `Negocio` + `owner: { id, nombre } \| null` |
+| Detalle | `GET /resenas/negocio/:id` | `[{ id, calificacion, comentario, creadoEn, usuario: { id, nombre } }]` |
+| Detalle | `POST /negocios/:id/clic-whatsapp`, `/clic-llamada` | Cualquier 2xx |
+
+## Formas de los datos
+**usuario:** `{ id, nombre, email, rol: 'cliente' | 'negocio', telefono?, telefonoVerificado? }`. Nunca debe incluir el hash de la contraseña ni el del código.
+
+**Negocio:** `id, nombre, descripcionCorta, categoria` (slug), `subcategoria, telefono` (10 dígitos), `direccion, latitud, longitud, horario, horariosJson, calificacion, imagenUrl, galeria, clicsWhatsapp, clicsLlamada, creadoEn`.
+- `horariosJson` usa las claves `lunes, martes, miercoles, jueves, viernes, sabado, domingo` (sin acentos), cada una `{ apertura: "09:00", cierre: "19:00", cerrado: false }`. Es lo que pinta el horario del detalle.
+- `latitud` y `longitud` deben ser reales: de ahí salen el mapa y la distancia.
+- `imagenUrl` es una URL completa.
+
+## Reglas de negocio que el frontend da por hechas
+- **Código de acceso:** 4 dígitos, vigencia de 10 minutos, 5 intentos, un envío por minuto (429 si se repite antes). `enviar` responde igual exista o no la cuenta, para no revelar quién está registrado.
+- **Teléfono de cliente:** obligatorio, 10 dígitos y único.
+- **Categorías:** el frontend no las tiene fijas; las pide a `/categorias`. Los `slug` deben coincidir con los de los iconos (`frontend/src/components/home/categoriaIconos.tsx`).
+- **Distancia:** en kilómetros, calculada desde `lat` y `lng` del usuario (fórmula haversine).
+- **Orden por defecto:** por calificación descendente.
+
+## Aún sin pantalla en el frontend
+`/favoritos`, `/negocios/cercanos`, `/auth/me`, `PUT/DELETE /negocios`, `POST /resenas`. Existen en este backend por si se necesitan.
