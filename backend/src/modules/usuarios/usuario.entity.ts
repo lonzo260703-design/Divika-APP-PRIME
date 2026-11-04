@@ -18,6 +18,10 @@ export class Usuario {
   @Column({ nullable: true })
   passwordHash: string;
 
+  // Solo proveedores (el diseño web pide nombre y apellidos por separado)
+  @Column({ type: 'varchar', nullable: true })
+  apellidos: string | null;
+
   @Column({ type: 'varchar', default: 'cliente' })
   rol: Rol;
 

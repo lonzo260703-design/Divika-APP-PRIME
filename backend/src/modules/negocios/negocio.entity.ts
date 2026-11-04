@@ -16,6 +16,10 @@ export class Negocio {
   @Column({ type: 'varchar', nullable: true })
   descripcionCorta: string | null;
 
+  // Descripción larga del perfil (máx. 600 caracteres); descripcionCorta es la de las cards
+  @Column({ type: 'varchar', nullable: true })
+  descripcion: string | null;
+
   @Column()
   categoria: string;
 
@@ -27,6 +31,23 @@ export class Negocio {
 
   @Column()
   direccion: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  ciudad: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  colonia: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  whatsapp: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  emailPublico: string | null;
+
+  // 'en_proceso' (alta sin terminar), 'publicado' (visible en el directorio) o 'pausado'.
+  // Solo los publicados salen en listados y búsquedas. Los negocios de ejemplo nacen publicados.
+  @Column({ type: 'varchar', default: 'publicado' })
+  estado: 'en_proceso' | 'publicado' | 'pausado';
 
   @Column({ type: 'float', nullable: true })
   latitud: number | null;

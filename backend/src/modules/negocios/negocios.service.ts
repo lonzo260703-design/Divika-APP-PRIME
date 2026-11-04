@@ -58,7 +58,7 @@ export class NegociosService implements OnModuleInit {
     lat?: number;
     lng?: number;
   }) {
-    const qb = this.repo.createQueryBuilder('n').orderBy('n.calificacion', 'DESC').addOrderBy('n.nombre', 'ASC');
+    const qb = this.repo.createQueryBuilder('n').where("n.estado = 'publicado'").orderBy('n.calificacion', 'DESC').addOrderBy('n.nombre', 'ASC');
     if (f.buscar) qb.andWhere('LOWER(n.nombre) LIKE :buscar', { buscar: `%${f.buscar.toLowerCase()}%` });
     if (f.categoria) qb.andWhere('n.categoria = :categoria', { categoria: f.categoria });
     if (f.subcategoria) qb.andWhere('n.subcategoria = :subcategoria', { subcategoria: f.subcategoria });
@@ -79,7 +79,7 @@ export class NegociosService implements OnModuleInit {
   }
 
   top(cantidad = 10) {
-    return this.repo.find({ order: { calificacion: 'DESC' }, take: cantidad });
+    return this.repo.find({ where: { estado: 'publicado' }, order: { calificacion: 'DESC' }, take: cantidad });
   }
 
   // Uso interno: devuelve la entidad completa (con dueño) para validar permisos y guardar
@@ -133,8 +133,8 @@ export class NegociosService implements OnModuleInit {
   }
 
   async listarCercanos(lat: number, lng: number, radioKm = 10) {
-    const negocios = await this.repo.find();
-    
+    const negocios = await this.repo.find({ where: { estado: 'publicado' } });
+
     return negocios
       .map((negocio) => {
         let distanciaKm: number | null = null;

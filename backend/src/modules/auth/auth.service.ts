@@ -9,7 +9,7 @@ import { Negocio } from '../negocios/negocio.entity';
 import { Usuario } from '../usuarios/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
 // MODIFICACIÓN: Importamos los nuevos DTOs creados en el paso anterior
-import { LoginDto, RegistroClienteDto, RegistroNegocioDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto, EnviarCodigoDto, VerificarCodigoDto } from './dto';
+import { LoginDto, RegistroClienteDto, RegistroNegocioDto, RegistroProveedorDto, GoogleLoginDto, AppleLoginDto, EnviarOtpDto, VerificarOtpDto, EnviarCodigoDto, VerificarCodigoDto } from './dto';
 
 const INTENTOS_MAX = 5;
 const ESPERA_REENVIO_SEG = 60;
@@ -67,6 +67,38 @@ export class AuthService {
     return this.respuesta(usuario);
   }
 
+  // Alta de proveedor desde el sitio web: crea usuario y negocio "en proceso" (no sale en el directorio hasta publicar)
+  async registrarProveedor(dto: RegistroProveedorDto) {
+    await this.verificarEmailLibre(dto.email);
+    const n = dto.negocio;
+    if (!subcategoriaValida(n.categoria, n.subcategoria)) {
+      throw new BadRequestException('Esa subcategoría no pertenece a la categoría elegida');
+    }
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const usuario = await this.dataSource.transaction(async (m) => {
+      const nuevo = await m.save(
+        m.create(Usuario, { nombre: dto.nombre.trim(), apellidos: dto.apellidos.trim(), email: dto.email.toLowerCase(), passwordHash, rol: 'negocio' }),
+      );
+      await m.save(
+        m.create(Negocio, {
+          nombre: n.nombre.trim(),
+          categoria: n.categoria,
+          subcategoria: n.subcategoria || null,
+          telefono: n.telefono,
+          whatsapp: n.telefono,
+          ciudad: n.ciudad.trim(),
+          colonia: n.colonia.trim(),
+          direccion: `${n.colonia.trim()}, ${n.ciudad.trim()}`,
+          estado: 'en_proceso',
+          calificacion: 0,
+          owner: nuevo,
+        }),
+      );
+      return nuevo;
+    });
+    return this.respuesta(usuario);
+  }
+
   async login(dto: LoginDto) {
     const usuario = await this.usuarios.buscarPorEmail(dto.email);
     // MODIFICACIÓN: Validamos si tiene passwordHash (por si acaso el usuario se creó por Google/Apple)
@@ -91,6 +123,7 @@ export class AuthService {
     return { 
       id: u.id, 
       nombre: u.nombre, 
+      apellidos: u.apellidos,
       email: u.email, 
       rol: u.rol,
       // MODIFICACIÓN: Devolvemos también el estado de validación del teléfono en el perfil

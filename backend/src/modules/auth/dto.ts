@@ -1,4 +1,5 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { Equals, IsBoolean, IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MinLength, ValidateNested } from 'class-validator';
 import { CATEGORIAS } from '../negocios/categorias';
 
 export class LoginDto {
@@ -55,6 +56,59 @@ export class RegistroNegocioDto {
   @IsOptional()
   @IsString()
   horario?: string;
+}
+
+export class NegocioProveedorDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre del negocio es obligatorio' })
+  nombre: string;
+
+  @IsIn(CATEGORIAS, { message: 'Elige una categoría válida' })
+  categoria: string;
+
+  @IsOptional()
+  @IsString()
+  subcategoria?: string;
+
+  @Matches(/^[0-9+()\-\s]{7,20}$/, { message: 'Teléfono no válido' })
+  telefono: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'La ciudad es obligatoria' })
+  ciudad: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'La colonia es obligatoria' })
+  colonia: string;
+}
+
+// Registro de proveedor desde el sitio web (diseño "Crea tu cuenta de proveedor")
+export class RegistroProveedorDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre es obligatorio' })
+  nombre: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Los apellidos son obligatorios' })
+  apellidos: string;
+
+  @IsEmail({}, { message: 'Correo no válido' })
+  email: string;
+
+  @IsString()
+  @MinLength(8, { message: 'La contraseña debe tener mínimo 8 caracteres' })
+  password: string;
+
+  @ValidateNested()
+  @Type(() => NegocioProveedorDto)
+  negocio: NegocioProveedorDto;
+
+  @Equals(true, { message: 'Debes aceptar los Términos y condiciones y el Aviso de privacidad' })
+  aceptaTerminos: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  recibirNovedades?: boolean;
 }
 
 // ==========================================
