@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { NegociosModule } from './modules/negocios/negocios.module';
 import { FavoritosModule } from './modules/favoritos/favoritos.module';
 import { ResenasModule } from './modules/resenas/resenas.module';
+import { CuentaModule } from './modules/cuenta/cuenta.module';
 import { ProveedoresModule } from './modules/proveedores/proveedores.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 
@@ -25,6 +26,7 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
     ResenasModule,
     FavoritosModule,
     ProveedoresModule,
+    CuentaModule,
   ],
 })
 export class AppModule {}

@@ -18,6 +18,24 @@ export class Usuario {
   @Column({ nullable: true })
   passwordHash: string;
 
+  // Datos de "Editar perfil"
+  @Column({ type: 'varchar', nullable: true })
+  fechaNacimiento: string | null; // AAAA-MM-DD
+
+  @Column({ type: 'varchar', nullable: true })
+  ciudad: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  avatarUrl: string | null;
+
+  // Teléfono nuevo que espera su código de verificación; el actual no cambia hasta confirmarlo
+  @Column({ type: 'varchar', nullable: true })
+  telefonoPendiente: string | null;
+
+  // Preferencias de notificaciones y privacidad (ver cuenta/preferencias.ts)
+  @Column({ type: 'simple-json', nullable: true })
+  preferencias: Record<string, any> | null;
+
   // Solo proveedores (el diseño web pide nombre y apellidos por separado)
   @Column({ type: 'varchar', nullable: true })
   apellidos: string | null;

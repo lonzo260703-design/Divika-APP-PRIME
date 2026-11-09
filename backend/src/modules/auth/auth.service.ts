@@ -124,6 +124,7 @@ export class AuthService {
       id: u.id, 
       nombre: u.nombre, 
       apellidos: u.apellidos,
+      avatarUrl: u.avatarUrl,
       email: u.email, 
       rol: u.rol,
       // MODIFICACIÓN: Devolvemos también el estado de validación del teléfono en el perfil
@@ -164,7 +165,7 @@ export class AuthService {
   }
 
   // Quita espacios, guiones y el prefijo +52 / 52 / 521: deja solo los 10 dígitos
-  private normalizarTelefono(telefono: string) {
+  normalizarTelefono(telefono: string) {
     let d = telefono.replace(/\D/g, '');
     if (d.length === 13 && d.startsWith('521')) d = d.slice(3);
     else if (d.length === 12 && d.startsWith('52')) d = d.slice(2);
@@ -184,7 +185,7 @@ export class AuthService {
   }
 
   // Genera el código, guarda solo su hash y lo "envía". Limita reenvíos a uno por minuto.
-  private async emitirCodigo(usuario: Usuario, destinoLog: string) {
+  async emitirCodigo(usuario: Usuario, destinoLog: string) {
     if (usuario.otpEnviadoEn) {
       const pasaron = (Date.now() - new Date(usuario.otpEnviadoEn).getTime()) / 1000;
       if (pasaron < ESPERA_REENVIO_SEG) {
@@ -205,7 +206,7 @@ export class AuthService {
   }
 
   // Revisa vigencia, intentos y coincidencia; si todo está bien, consume el código
-  private async comprobarCodigo(usuario: Usuario, codigo: string) {
+  async comprobarCodigo(usuario: Usuario, codigo: string) {
     if (!usuario.codigoOtp || !usuario.otpExpiraEn || new Date() > new Date(usuario.otpExpiraEn)) {
       throw new BadRequestException('El código expiró. Solicita uno nuevo');
     }
