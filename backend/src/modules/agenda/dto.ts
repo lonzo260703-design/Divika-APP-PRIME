@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsIn, IsObject, ValidateNested, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, MaxLength, Min } from 'class-validator';
 import { METODOS_PAGO } from '../proveedores/negocio-proveedor.dto';
 
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
@@ -82,4 +82,35 @@ export class RespuestaResenaDto {
   @IsNotEmpty({ message: 'Escribe tu respuesta' })
   @MaxLength(500, { message: 'La respuesta puede tener máximo 500 caracteres' })
   texto: string;
+}
+
+export class ReglasDto {
+  @IsInt() @Min(15, { message: 'La duración base mínima es 15 minutos' }) @Max(480, { message: 'La duración base máxima es 8 horas' })
+  duracionBase: number;
+
+  @IsIn([15, 30, 60], { message: 'El intervalo debe ser de 15, 30 o 60 minutos' })
+  intervaloMin: number;
+
+  @IsInt() @Min(0) @Max(168, { message: 'La anticipación máxima es de 168 horas' })
+  anticipacionHoras: number;
+
+  @IsInt() @Min(1) @Max(180, { message: 'Máximo 180 días hacia adelante' })
+  maxDias: number;
+}
+
+export class BloqueoDto {
+  @Matches(FECHA, { message: 'Fecha inicial no válida' }) desde: string;
+  @Matches(FECHA, { message: 'Fecha final no válida' }) hasta: string;
+  @IsOptional() @IsString() @MaxLength(60, { message: 'El motivo puede tener máximo 60 caracteres' }) motivo?: string;
+}
+
+export class DisponibilidadDto {
+  @IsOptional() @IsObject()
+  horarios?: Record<string, { apertura: string; cierre: string; cerrado: boolean }>;
+
+  @IsOptional() @ValidateNested() @Type(() => ReglasDto)
+  reglas?: ReglasDto;
+
+  @IsOptional() @IsArray() @ArrayMaxSize(30, { message: 'Máximo 30 bloqueos' }) @ValidateNested({ each: true }) @Type(() => BloqueoDto)
+  bloqueos?: BloqueoDto[];
 }

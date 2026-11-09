@@ -77,6 +77,14 @@ export class Negocio {
   @Column({ type: 'json', nullable: true })
   galeria: string[] | null;
 
+  // Reglas para ofrecer horas: duración base de una cita, cada cuántos minutos inicia una, anticipación mínima y hasta cuántos días adelante se reserva
+  @Column({ type: 'json', nullable: true })
+  disponibilidad: { duracionBase: number; intervaloMin: number; anticipacionHoras: number; maxDias: number } | null;
+
+  // Fechas en las que no se atiende (vacaciones, mantenimiento…)
+  @Column({ type: 'json', nullable: true })
+  bloqueos: { desde: string; hasta: string; motivo: string }[] | null;
+
   // Formas de pago que acepta el negocio (solo informativo: Divika no procesa pagos)
   @Column({ type: 'json', nullable: true })
   metodosPago: string[] | null;

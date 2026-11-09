@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { IconBack, IconCheck } from '@/components/ui/icons';
 import { api } from '@/lib/api';
 import { cx } from '@/lib/cx';
-import { NOMBRE_PAGO, diasDisponibles, fechaLarga, horasDelDia, pesos } from '@/lib/reservas';
-import type { Cita, NegocioDetalle, Servicio } from '@/types';
+import { NOMBRE_PAGO, diasDisponibles, fechaLarga, pesos } from '@/lib/reservas';
+import type { Cita, NegocioDetalle, OfertaDia, Servicio } from '@/types';
 
 const PASOS = ['Fecha', 'Detalles', 'Resumen', 'Pago', 'Listo'];
 
@@ -18,7 +18,7 @@ export default function ReservarPage() {
   const router = useRouter();
   const [negocio, setNegocio] = useState<NegocioDetalle | null>(null);
   const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [ocupadas, setOcupadas] = useState<string[]>([]);
+  const [oferta, setOferta] = useState<OfertaDia | null>(null);
   const [paso, setPaso] = useState(0);
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
@@ -37,14 +37,14 @@ export default function ReservarPage() {
 
   useEffect(() => {
     if (!fecha) return;
-    setOcupadas([]);
-    api<{ ocupadas: string[] }>(`/negocios/${id}/disponibilidad?fecha=${fecha}`).then((r) => setOcupadas(r.ocupadas)).catch(() => {});
+    setOferta(null);
+    api<OfertaDia>(`/negocios/${id}/disponibilidad?fecha=${fecha}`).then(setOferta).catch(() => {});
   }, [id, fecha]);
 
   const dias = useMemo(() => diasDisponibles(negocio?.horariosJson ?? null), [negocio]);
   if (!negocio) return null;
   const dia = dias.find((d) => d.fecha === fecha);
-  const horas = dia?.horario ? horasDelDia(dia.horario, fecha, ocupadas) : [];
+  const horas = oferta?.horas ?? [];
   const servicio = servicios.find((s) => s.id === servicioId) ?? null;
   const pagos = negocio.metodosPago ?? [];
 
@@ -84,7 +84,8 @@ export default function ReservarPage() {
               </button>
             ))}
           </div>
-          {dia?.horario && (
+          {fecha && oferta && !oferta.abierto && <p className="pantalla-nota">{oferta.motivo ?? 'Sin disponibilidad ese día.'}</p>}
+          {oferta?.abierto && (
             <>
               <h2 className="seccion-titulo">Elige la hora</h2>
               <div className="horas">
@@ -93,6 +94,7 @@ export default function ReservarPage() {
                 ))}
               </div>
               {horas.every((h) => !h.libre) && <p className="pantalla-nota">No quedan horarios este día.</p>}
+              <p className="pantalla-nota">Las horas se calculan para un servicio de {oferta.duracionMin} min.</p>
             </>
           )}
           <Button className="btn--block" disabled={!fecha || !hora} onClick={() => setPaso(1)}>Continuar</Button>

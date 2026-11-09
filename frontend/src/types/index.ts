@@ -113,3 +113,11 @@ export type Conversacion = {
   ultimo: { texto: string; de: string; creadoEn: string };
   sinLeer: number;
 };
+
+export type Notificacion = { id: number; tipo: 'cita' | 'mensaje' | 'resena'; titulo: string; detalle: string | null; enlace: string | null; leida: boolean; creadoEn: string };
+export type Disponibilidad = {
+  horarios: Record<string, HorarioDia>;
+  reglas: { duracionBase: number; intervaloMin: number; anticipacionHoras: number; maxDias: number };
+  bloqueos: { desde: string; hasta: string; motivo: string }[];
+};
+export type OfertaDia = { fecha: string; abierto: boolean; motivo?: string; duracionMin: number; horas: { hora: string; libre: boolean }[] };

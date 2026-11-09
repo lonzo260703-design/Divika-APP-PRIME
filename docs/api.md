@@ -88,8 +88,8 @@ Estados de una cita: `solicitada → confirmada | rechazada`, `solicitada → pr
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/negocios/:id/servicios` | Servicios activos del negocio: `{ id, nombre, descripcion, precio (nulo = a consultar), duracionMin, activo }` |
-| GET | `/negocios/:id/disponibilidad?fecha=AAAA-MM-DD` | `{ fecha, ocupadas: ["10:00"] }` horas ya confirmadas |
-| POST 🔒 | `/citas` | Cliente: `{ negocioId, servicioId?, fecha, hora, personas, notas?, metodoPago? }`. 409 si el horario está ocupado o ya pidió ese horario |
+| GET | `/negocios/:id/disponibilidad?fecha=AAAA-MM-DD&servicioId=` | Oferta calculada por el servidor: `{ fecha, abierto, motivo?, duracionMin, horas: [{ hora, libre }], ocupadas: ["10:00"] }`. Aplica horario semanal, bloqueos, anticipación mínima, días máximos y traslape con citas confirmadas (según duración del servicio). 404 si el negocio no está publicado |
+| POST 🔒 | `/citas` | Cliente: `{ negocioId, servicioId?, fecha, hora, personas, notas?, metodoPago? }`. 400 si la hora está fuera de la oferta (cerrado, bloqueado, anticipación); 409 si el horario está ocupado o ya pidió ese horario |
 | GET 🔒 | `/citas/mias` | Citas del cliente |
 | POST 🔒 | `/citas/:id/aceptar-propuesta` | El cliente acepta el horario que propuso el negocio |
 | POST 🔒 | `/citas/:id/cancelar` | Cancela el cliente dueño de la cita o el dueño del negocio |
@@ -99,10 +99,20 @@ Estados de una cita: `solicitada → confirmada | rechazada`, `solicitada → pr
 | POST 🔒 | `/proveedor/citas/:id/confirmar`, `/rechazar` | Solo si está `solicitada` |
 | POST 🔒 | `/proveedor/citas/:id/proponer` | `{ fecha, hora }` → estado `propuesta` |
 | GET / POST 🔒 | `/proveedor/mensajes`, `/proveedor/mensajes/:clienteId` | Conversaciones, hilo y respuesta. Solo se responde a clientes que escribieron o pidieron cita |
+| GET / PUT 🔒 | `/proveedor/disponibilidad` | `{ horarios: { domingo…sabado: { apertura, cierre, cerrado } }, reglas: { duracionBase, intervaloMin (15/30/60), anticipacionHoras, maxDias }, bloqueos: [{ desde, hasta, motivo? }] }`. PUT acepta cualquier parte; 400 si cierre ≤ apertura, intervalo inválido o bloqueo con `hasta` < `desde`. Zona horaria: variable `TZ_NEGOCIOS` (por defecto America/Mexico_City) |
 | GET 🔒 | `/proveedor/resenas` | Reseñas del negocio |
 | POST 🔒 | `/proveedor/resenas/:id/respuesta` | `{ texto }` (máx. 500). Aparece como `respuesta` en `GET /resenas/negocio/:id` |
 
-Sin avisos automáticos todavía (no se envía SMS/correo/push cuando llega una cita o mensaje); el front consulta cada 8 s en los chats.
+## Notificaciones 🔒 (cualquier rol)
+Avisos dentro de la app. Se crean al: llegar/confirmar/rechazar/proponer/aceptar/cancelar una cita, recibir un mensaje (en ambos sentidos), recibir una reseña y al responder el negocio una reseña.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/notificaciones` | `{ noLeidas, items: [{ id, tipo: cita\|mensaje\|resena, titulo, detalle, enlace, leida, creadoEn }] }` (más recientes primero) |
+| POST | `/notificaciones/:id/leer` | Marca una como leída (404 si no es del usuario) |
+| POST | `/notificaciones/leer-todas` | Marca todas |
+
+Todavía no se envía SMS/correo/push; el portal consulta `/notificaciones` cada 30 s y los chats cada 8 s.
 
 ## Favoritos
 | Método | Ruta | Descripción |

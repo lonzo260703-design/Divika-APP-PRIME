@@ -6,7 +6,8 @@ import { api } from '@/lib/api';
 import { cx } from '@/lib/cx';
 import { fechaLarga, iso, pesos } from '@/lib/reservas';
 import { useEscritorio } from '@/lib/useEscritorio';
-import type { Cita } from '@/types';
+import { DisponibilidadForm } from '@/components/portal/DisponibilidadForm';
+import type { Cita, Disponibilidad } from '@/types';
 
 const SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -15,6 +16,7 @@ export default function Calendario() {
   const escritorio = useEscritorio() === true;
   const [citas, setCitas] = useState<Cita[] | null>(null);
   const [error, setError] = useState('');
+  const [disp, setDisp] = useState<Disponibilidad | null>(null);
   const [dia, setDia] = useState(iso(new Date()));
   const [mes, setMes] = useState(() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
   useEffect(() => { api<Cita[]>('/proveedor/citas').then(setCitas).catch((e: Error) => { setError(e.message); setCitas([]); }); }, []);
@@ -28,6 +30,7 @@ export default function Calendario() {
   const delDia = confirmadas.filter((c) => c.fecha === dia).sort((a, b) => a.hora.localeCompare(b.hora));
   const pendientes = (citas ?? []).filter((c) => c.estado === 'solicitada').length;
   const hoy = iso(new Date());
+  const bloqueado = (f: string) => !!disp?.bloqueos.some((b) => f >= b.desde && f <= b.hasta) || !!disp?.horarios[['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][new Date(`${f}T12:00:00`).getDay()]]?.cerrado;
 
   const panel = (
     <div className="p-tarjeta">
@@ -45,7 +48,8 @@ export default function Calendario() {
 
   return (
     <div className={escritorio ? 'p-ancho' : 'p-estrecho'}>
-      <h1 className="p-titulo">Calendario</h1>
+      <h1 className="p-titulo">Calendario y disponibilidad</h1>
+      <p className="p-sub">Mira tus citas y define cuándo y cómo te pueden reservar.</p>
       {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
       {pendientes > 0 && <p className="p-sub">Tienes {pendientes} solicitud{pendientes === 1 ? '' : 'es'} por responder en Solicitudes y citas.</p>}
       <div className={escritorio ? 'p-dos' : undefined}>
@@ -62,7 +66,7 @@ export default function Calendario() {
               const f = iso(d);
               const n = confirmadas.filter((c) => c.fecha === f).length;
               return (
-                <button key={f} type="button" aria-pressed={dia === f} className={cx('mes__dia', dia === f && 'mes__dia--sel', f === hoy && 'mes__dia--hoy')} onClick={() => setDia(f)}>
+                <button key={f} type="button" aria-pressed={dia === f} className={cx('mes__dia', dia === f && 'mes__dia--sel', f === hoy && 'mes__dia--hoy', bloqueado(f) && 'mes__dia--bloq')} onClick={() => setDia(f)}>
                   {d.getDate()}
                   {n > 0 && <i>{n}</i>}
                 </button>
@@ -72,6 +76,7 @@ export default function Calendario() {
         </div>
         {panel}
       </div>
+      <DisponibilidadForm onGuardado={setDisp} />
     </div>
   );
 }

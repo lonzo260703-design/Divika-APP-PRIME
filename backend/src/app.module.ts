@@ -9,6 +9,7 @@ import { CuentaModule } from './modules/cuenta/cuenta.module';
 import { ProveedoresModule } from './modules/proveedores/proveedores.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
 import { AgendaModule } from './modules/agenda/agenda.module';
+import { NotificacionesModule } from './modules/notificaciones/notificaciones.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AgendaModule } from './modules/agenda/agenda.module';
     ProveedoresModule,
     CuentaModule,
     AgendaModule,
+    NotificacionesModule,
   ],
 })
 export class AppModule {}

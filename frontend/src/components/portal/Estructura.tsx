@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 import { cx } from '@/lib/cx';
 import { cerrarSesion } from '@/lib/auth';
 import { useEscritorio } from '@/lib/useEscritorio';
@@ -67,6 +68,14 @@ export function Estructura({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [menu, setMenu] = useState(false);
   const [cuenta, setCuenta] = useState(false);
+  const [avisos, setAvisos] = useState(0);
+  useEffect(() => {
+    const cargar = () => api<{ noLeidas: number }>('/notificaciones').then((r) => setAvisos(r.noLeidas)).catch(() => {});
+    cargar();
+    const id = setInterval(cargar, 30000);
+    window.addEventListener('divika:avisos', cargar);
+    return () => { clearInterval(id); window.removeEventListener('divika:avisos', cargar); };
+  }, [ruta]);
   const movil = useEscritorio() === false;
   const activo = (slug: string) => (slug ? ruta.startsWith(`/portal/${slug}`) : ruta === '/portal');
   const nombreCompleto = [usuario.nombre, usuario.apellidos].filter(Boolean).join(' ');
@@ -94,7 +103,7 @@ export function Estructura({ children }: { children: ReactNode }) {
           {negocio.estado === 'publicado' ? (
             <Link href={`/negocio/${negocio.id}`} className="p-barra-sup__enlace">Ver mi perfil público <IconExternal /></Link>
           ) : null}
-          <span className="p-campana" aria-label="Notificaciones"><IconBell /></span>
+          <Link href="/portal/notificaciones" className="p-campana" aria-label={avisos ? `Notificaciones (${avisos} sin leer)` : 'Notificaciones'}><IconBell />{avisos > 0 && <i>{avisos > 9 ? '9+' : avisos}</i>}</Link>
           <div className="p-cuenta">
             <button type="button" onClick={() => setCuenta((c) => !c)} aria-expanded={cuenta}>
               <span className="p-avatar p-avatar--chico">{iniciales(nombreCompleto)}</span>

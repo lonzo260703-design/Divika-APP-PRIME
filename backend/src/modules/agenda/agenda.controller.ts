@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/jwt-auth.guard';
 import { AgendaService } from './agenda.service';
-import { CrearCitaDto, MensajeDto, ProponerHorarioDto, RespuestaResenaDto, ServicioDto } from './dto';
+import { CrearCitaDto, DisponibilidadDto, MensajeDto, ProponerHorarioDto, RespuestaResenaDto, ServicioDto } from './dto';
 
 type Req_ = { user: { sub: number } };
 
@@ -16,9 +16,9 @@ export class AgendaPublicaController {
   }
 
   @Get(':id/disponibilidad')
-  disponibilidad(@Param('id', ParseIntPipe) id: number, @Query('fecha') fecha: string) {
+  disponibilidad(@Param('id', ParseIntPipe) id: number, @Query('fecha') fecha: string, @Query('servicioId') servicioId?: string) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha ?? '')) throw new BadRequestException('Manda la fecha como AAAA-MM-DD');
-    return this.s.horasOcupadas(id, fecha);
+    return this.s.horasOcupadas(id, fecha, servicioId ? Number(servicioId) : undefined);
   }
 }
 
@@ -111,6 +111,15 @@ export class AgendaProveedorController {
   @Post('mensajes/:clienteId')
   enviar(@Req() r: Req_, @Param('clienteId', ParseIntPipe) id: number, @Body() dto: MensajeDto) {
     return this.s.enviarNegocio(r.user.sub, id, dto);
+  }
+
+  @Get('disponibilidad')
+  miDisponibilidad(@Req() r: Req_) {
+    return this.s.disponibilidadMia(r.user.sub);
+  }
+  @Put('disponibilidad')
+  guardarDisponibilidad(@Req() r: Req_, @Body() dto: DisponibilidadDto) {
+    return this.s.guardarDisponibilidad(r.user.sub, dto);
   }
 
   @Get('resenas')

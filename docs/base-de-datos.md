@@ -124,6 +124,16 @@ erDiagram
     string ciudad
     date creadoEn
   }
+  notificaciones {
+    int id PK
+    int usuarioId FK
+    string tipo "cita, mensaje o resena"
+    string titulo
+    string detalle
+    string enlace
+    bool leida
+    date creadoEn
+  }
   favoritos {
     int id PK
     int usuarioId FK
@@ -131,6 +141,8 @@ erDiagram
     date creadoEn
   }
 ```
+
+`negocios.disponibilidad` (json: duracionBase, intervaloMin, anticipacionHoras, maxDias) y `negocios.bloqueos` (json: lista de {desde, hasta, motivo}) junto con `horariosJson` definen las horas reservables. En PostgreSQL pueden ser `jsonb` o tablas aparte. `notificaciones` pertenece a un usuario (cliente o negocio).
 
 `interesados` guarda los contactos del formulario "Únete gratis" de la landing (sin cuenta, sin relaciones).
 

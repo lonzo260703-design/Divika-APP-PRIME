@@ -5,9 +5,11 @@ import { ResenasService } from './resenas.service';
 import { ResenasController } from './resenas.controller';
 import { AuthModule } from '../auth/auth.module';
 import { Negocio } from '../negocios/negocio.entity';
+import { Usuario } from '../usuarios/usuario.entity';
+import { NotificacionesModule } from '../notificaciones/notificaciones.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Resena, Negocio]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Resena, Negocio, Usuario]), AuthModule, NotificacionesModule],
   controllers: [ResenasController],
   providers: [ResenasService],
 })

@@ -5,12 +5,15 @@ import { Resena } from './resena.entity';
 import { Negocio } from '../negocios/negocio.entity';
 import { Usuario } from '../usuarios/usuario.entity';
 import { CrearResenaDto } from './dto';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
 
 @Injectable()
 export class ResenasService {
   constructor(
     @InjectRepository(Resena) private repo: Repository<Resena>,
     @InjectRepository(Negocio) private negocioRepo: Repository<Negocio>,
+    @InjectRepository(Usuario) private usuarios: Repository<Usuario>,
+    private avisos: NotificacionesService,
   ) {}
 
   // Listar todas las reseñas de un negocio específico
@@ -41,6 +44,8 @@ export class ResenasService {
 
     // Recalcular el promedio de calificación del negocio
     await this.actualizarCalificacionPromedio(dto.negocioId);
+    const autor = await this.usuarios.findOne({ where: { id: usuarioId }, select: { id: true, nombre: true } });
+    await this.avisos.avisarAlDueno(dto.negocioId, { tipo: 'resena', titulo: `${autor?.nombre ?? 'Un cliente'} dejó una reseña de ${dto.calificacion} estrellas`, detalle: dto.comentario, enlace: '/portal/resenas' });
 
     return guardada;
   }

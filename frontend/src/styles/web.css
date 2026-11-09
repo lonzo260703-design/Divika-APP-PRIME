@@ -351,3 +351,19 @@
 .mes__dia--hoy { border-color: var(--portal-morado); font-weight: 700; }
 .mes__dia--sel { background: var(--portal-morado); border-color: var(--portal-morado); color: #fff; }
 .mes__dia--sel i { background: #fff; color: var(--portal-morado); }
+.p-campana { position: relative; }
+.p-campana i { position: absolute; top: -6px; right: -8px; min-width: 16px; padding: 0 4px; border-radius: 999px; background: var(--color-acento); color: #fff; font-size: 9px; font-style: normal; font-weight: 700; line-height: 16px; text-align: center; }
+.aviso-fila { display: flex; gap: var(--espacio-3); align-items: flex-start; padding: 10px 8px; border-top: 1px solid var(--portal-borde); color: inherit; text-decoration: none; border-radius: 8px; }
+.aviso-fila:first-of-type { border-top: 0; }
+.aviso-fila--nueva { background: var(--portal-suave); }
+.aviso-fila strong { display: block; font-size: 13px; }
+.aviso-fila small { display: block; font-size: 11px; color: #6b6f8d; }
+.aviso-fila time { margin-left: auto; font-size: 10px; color: #6b6f8d; white-space: nowrap; }
+.aviso-dia { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #6b6f8d; }
+.disp-fila { display: grid; grid-template-columns: 90px auto 1fr; align-items: center; gap: var(--espacio-2); padding: 6px 0; border-top: 1px solid var(--portal-borde); font-size: 12px; }
+.disp-fila:first-of-type { border-top: 0; }
+.disp-fila input[type=time] { padding: 6px 8px; border: 1px solid var(--portal-borde); border-radius: 8px; font: inherit; font-size: 12px; }
+.disp-horas { display: flex; align-items: center; gap: 6px; }
+.disp-bloqueo { display: flex; flex-wrap: wrap; gap: var(--espacio-2); align-items: center; padding: 6px 0; border-top: 1px solid var(--portal-borde); }
+.disp-bloqueo input { padding: 6px 8px; border: 1px solid var(--portal-borde); border-radius: 8px; font: inherit; font-size: 12px; }
+.mes__dia--bloq { background: repeating-linear-gradient(45deg, #f3f3f8, #f3f3f8 4px, #e6e6f0 4px, #e6e6f0 8px); color: #9a9ab5; }
