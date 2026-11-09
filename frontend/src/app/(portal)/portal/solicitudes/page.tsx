@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Aviso } from '@/components/ui/Aviso';
 import { api } from '@/lib/api';
-import { ESTADO_CITA, fechaLarga, iso, pesos } from '@/lib/reservas';
+import { ESTADO_CITA, fechaCorta, fechaLarga, iso, pesos } from '@/lib/reservas';
+import { useEscritorio } from '@/lib/useEscritorio';
 import type { Cita } from '@/types';
 
 type Pestana = 'solicitudes' | 'confirmadas' | 'historial';
@@ -15,6 +16,8 @@ export default function Solicitudes() {
   const [pf, setPf] = useState('');
   const [ph, setPh] = useState('');
   const [error, setError] = useState('');
+  const [sel, setSel] = useState<number | null>(null);
+  const escritorio = useEscritorio() === true;
 
   const cargar = useCallback(() => api<Cita[]>('/proveedor/citas').then(setCitas).catch((e: Error) => { setError(e.message); setCitas([]); }), []);
   useEffect(() => { cargar(); }, [cargar]);
@@ -39,19 +42,7 @@ export default function Solicitudes() {
   const lista = (citas ?? []).filter(filtro[tab]);
   const cuenta = (t: Pestana) => (citas ?? []).filter(filtro[t]).length;
 
-  return (
-    <div className="p-estrecho">
-      <h1 className="p-titulo">Solicitudes y citas</h1>
-      {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
-      <div className="tabs" role="tablist">
-        {(['solicitudes', 'confirmadas', 'historial'] as Pestana[]).map((t) => (
-          <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)}>
-            {t === 'solicitudes' ? 'Solicitudes' : t === 'confirmadas' ? 'Confirmadas' : 'Historial'} ({cuenta(t)})
-          </button>
-        ))}
-      </div>
-      {citas && lista.length === 0 && <p className="p-sub">No hay nada aquí por ahora.</p>}
-      {lista.map((c) => (
+  const tarjeta = (c: Cita) => (
         <div key={c.id} className="cita">
           <div className="cita__cab">
             <strong>{c.cliente.nombre}</strong>
@@ -83,7 +74,42 @@ export default function Solicitudes() {
             </div>
           )}
         </div>
-      ))}
+  );
+
+  const elegida = lista.find((c) => c.id === sel) ?? lista[0] ?? null;
+  const chip = (c: Cita) => `chip-estado${c.estado === 'confirmada' ? '' : c.estado === 'solicitada' ? ' chip-estado--pendiente' : c.estado === 'propuesta' ? ' chip-estado--propuesta' : ' chip-estado--cerrado'}`;
+
+  return (
+    <div className={escritorio ? 'p-ancho' : 'p-estrecho'}>
+      <h1 className="p-titulo">Solicitudes y citas</h1>
+      {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
+      <div className="tabs" role="tablist">
+        {(['solicitudes', 'confirmadas', 'historial'] as Pestana[]).map((t) => (
+          <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)}>
+            {t === 'solicitudes' ? 'Solicitudes' : t === 'confirmadas' ? 'Confirmadas' : 'Historial'} ({cuenta(t)})
+          </button>
+        ))}
+      </div>
+      {escritorio ? (
+        <div className="p-maestro">
+          <div className="p-tarjeta">
+            {lista.map((c) => (
+              <button key={c.id} type="button" className={`p-fila-sel${elegida?.id === c.id ? ' p-fila-sel--on' : ''}`} onClick={() => setSel(c.id)}>
+                <span className="p-avatar p-avatar--chico">{c.cliente.nombre.charAt(0).toUpperCase()}</span>
+                <span><strong>{c.cliente.nombre}</strong><small>{c.servicio?.nombre ?? 'Cita'} · {fechaCorta(c.fecha)} · {c.hora} h</small></span>
+                <span className={chip(c)}>{ESTADO_CITA[c.estado]}</span>
+              </button>
+            ))}
+            {citas && lista.length === 0 && <p className="p-sub">No hay nada aquí por ahora.</p>}
+          </div>
+          <div>{elegida ? tarjeta(elegida) : <p className="p-sub">Elige una solicitud para ver el detalle.</p>}</div>
+        </div>
+      ) : (
+        <>
+          {citas && lista.length === 0 && <p className="p-sub">No hay nada aquí por ahora.</p>}
+          {lista.map(tarjeta)}
+        </>
+      )}
     </div>
   );
 }

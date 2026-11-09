@@ -5,42 +5,33 @@ import { Aviso } from '@/components/ui/Aviso';
 import { api } from '@/lib/api';
 import { cx } from '@/lib/cx';
 import { fechaLarga, iso, pesos } from '@/lib/reservas';
+import { useEscritorio } from '@/lib/useEscritorio';
 import type { Cita } from '@/types';
 
-// Agenda: próximos 14 días con las citas confirmadas de cada uno
+const SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+// Calendario mensual con las citas confirmadas; al elegir un día se ve su agenda
 export default function Calendario() {
+  const escritorio = useEscritorio() === true;
   const [citas, setCitas] = useState<Cita[] | null>(null);
   const [error, setError] = useState('');
   const [dia, setDia] = useState(iso(new Date()));
+  const [mes, setMes] = useState(() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
   useEffect(() => { api<Cita[]>('/proveedor/citas').then(setCitas).catch((e: Error) => { setError(e.message); setCitas([]); }); }, []);
 
-  const dias = useMemo(() => {
-    const h = new Date();
-    return Array.from({ length: 14 }, (_, i) => new Date(h.getFullYear(), h.getMonth(), h.getDate() + i));
-  }, []);
   const confirmadas = (citas ?? []).filter((c) => c.estado === 'confirmada');
+  const celdas = useMemo(() => {
+    const inicio = (mes.getDay() + 6) % 7; // lunes = 0
+    const total = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate();
+    return [...Array(inicio).fill(null), ...Array.from({ length: total }, (_, i) => new Date(mes.getFullYear(), mes.getMonth(), i + 1))];
+  }, [mes]);
   const delDia = confirmadas.filter((c) => c.fecha === dia).sort((a, b) => a.hora.localeCompare(b.hora));
   const pendientes = (citas ?? []).filter((c) => c.estado === 'solicitada').length;
+  const hoy = iso(new Date());
 
-  return (
-    <div className="p-estrecho">
-      <h1 className="p-titulo">Calendario</h1>
-      {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
-      {pendientes > 0 && <p className="p-sub">Tienes {pendientes} solicitud{pendientes === 1 ? '' : 'es'} por responder en Solicitudes y citas.</p>}
-      <div className="dias">
-        {dias.map((d) => {
-          const f = iso(d);
-          const n = confirmadas.filter((c) => c.fecha === f).length;
-          return (
-            <button key={f} type="button" aria-pressed={dia === f} className={cx('dia', dia === f && 'dia--activo')} onClick={() => setDia(f)}>
-              <small>{d.toLocaleDateString('es-MX', { weekday: 'short' })}</small>
-              <strong>{d.getDate()}</strong>
-              <small>{n > 0 ? `${n} cita${n === 1 ? '' : 's'}` : '—'}</small>
-            </button>
-          );
-        })}
-      </div>
-      <h2 className="seccion-titulo">{fechaLarga(dia)}</h2>
+  const panel = (
+    <div className="p-tarjeta">
+      <h2 style={{ textTransform: 'capitalize' }}>{fechaLarga(dia)}</h2>
       {citas && delDia.length === 0 && <p className="p-sub">Sin citas confirmadas este día.</p>}
       {delDia.map((c) => (
         <div key={c.id} className="cita">
@@ -49,6 +40,38 @@ export default function Calendario() {
           {c.notas && <small>“{c.notas}”</small>}
         </div>
       ))}
+    </div>
+  );
+
+  return (
+    <div className={escritorio ? 'p-ancho' : 'p-estrecho'}>
+      <h1 className="p-titulo">Calendario</h1>
+      {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
+      {pendientes > 0 && <p className="p-sub">Tienes {pendientes} solicitud{pendientes === 1 ? '' : 'es'} por responder en Solicitudes y citas.</p>}
+      <div className={escritorio ? 'p-dos' : undefined}>
+        <div className="p-tarjeta">
+          <div className="p-fila-cab">
+            <button type="button" className="p-btn p-btn--borde" aria-label="Mes anterior" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}>‹</button>
+            <h2 style={{ textTransform: 'capitalize' }}>{mes.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}</h2>
+            <button type="button" className="p-btn p-btn--borde" aria-label="Mes siguiente" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))}>›</button>
+          </div>
+          <div className="mes">
+            {SEMANA.map((d) => <small key={d} className="mes__sem">{d}</small>)}
+            {celdas.map((d, i) => {
+              if (!d) return <span key={`v${i}`} />;
+              const f = iso(d);
+              const n = confirmadas.filter((c) => c.fecha === f).length;
+              return (
+                <button key={f} type="button" aria-pressed={dia === f} className={cx('mes__dia', dia === f && 'mes__dia--sel', f === hoy && 'mes__dia--hoy')} onClick={() => setDia(f)}>
+                  {d.getDate()}
+                  {n > 0 && <i>{n}</i>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {panel}
+      </div>
     </div>
   );
 }

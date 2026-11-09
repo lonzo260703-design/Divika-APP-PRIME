@@ -302,3 +302,52 @@
 .p-nav-inferior a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; border-radius: 10px; font-size: 10px; font-weight: 600; color: #6b6f8d; text-decoration: none; }
 .p-nav-inferior a[aria-current=page] { color: var(--portal-morado); background: #f0effa; }
 .p-movil .p-contenido { padding-bottom: 84px; }
+
+/* ---------- Portal web: tableros y listas (diseño de escritorio) ---------- */
+.p-cab-pagina { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--espacio-3); }
+.p-fila-cab { display: flex; align-items: center; justify-content: space-between; gap: var(--espacio-2); }
+.p-dos { display: grid; grid-template-columns: 1fr; gap: var(--espacio-4); align-items: start; }
+.p-col { display: flex; flex-direction: column; gap: var(--espacio-4); min-width: 0; }
+.stats--4 { grid-template-columns: repeat(2, 1fr); }
+.stat { text-decoration: none; }
+.p-item { display: flex; align-items: center; gap: var(--espacio-3); padding: 8px 0; border-top: 1px solid var(--portal-borde); color: inherit; text-decoration: none; }
+.p-item:first-of-type { border-top: 0; }
+.p-item > span:nth-child(2) { flex: 1; min-width: 0; }
+.p-item strong { display: block; font-size: 13px; }
+.p-item small { display: block; font-size: 11px; color: #6b6f8d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-fecha { display: grid; place-items: center; width: 40px; padding: 4px 0; border-radius: 8px; background: var(--portal-suave); color: var(--portal-morado); text-transform: capitalize; }
+.p-fecha strong { font-size: 15px; line-height: 1; }
+.p-fecha small { font-size: 9px; color: inherit; }
+.p-medidor { display: block; height: 6px; border-radius: 999px; background: var(--portal-suave); overflow: hidden; }
+.p-medidor span { display: block; height: 100%; background: var(--portal-morado); }
+.p-check { display: flex; gap: 8px; padding: 4px 0; font-size: 12px; color: #55557a; text-decoration: none; }
+.p-check--ok { color: var(--portal-verde); }
+.p-maestro { display: grid; grid-template-columns: 1fr; gap: var(--espacio-4); align-items: start; }
+.p-ancho { max-width: none; }
+@media (min-width: 900px) {
+  .p-dos { grid-template-columns: 1.4fr 1fr; }
+  .stats--4 { grid-template-columns: repeat(4, 1fr); }
+  .p-maestro { grid-template-columns: 340px 1fr; }
+  .p-maestro--sel .p-lista-solo-movil { display: none; }
+}
+.p-fila-sel { display: flex; align-items: center; gap: var(--espacio-3); width: 100%; padding: 10px 8px; border: 0; border-top: 1px solid var(--portal-borde); border-radius: 8px; background: none; text-align: left; color: inherit; }
+.p-fila-sel:first-child { border-top: 0; }
+.p-fila-sel > span:nth-child(2) { flex: 1; min-width: 0; }
+.p-fila-sel strong { display: block; font-size: 13px; }
+.p-fila-sel small { display: block; font-size: 11px; color: #6b6f8d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-fila-sel--on { background: var(--portal-suave); }
+.p-buscar { width: 100%; padding: 9px 12px; border: 1px solid var(--portal-borde); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; }
+.conv-fila--on { background: var(--portal-suave); border-radius: 8px; padding-inline: 8px; }
+.resumen-resenas { flex-direction: row; align-items: center; gap: var(--espacio-5); flex-wrap: wrap; }
+.resumen-resenas > div:first-child { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.resumen-resenas__n { font-size: 34px; line-height: 1; color: var(--color-primario); }
+.resumen-resenas small { font-size: 11px; color: #6b6f8d; }
+.resumen-resenas__barras { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px; }
+.resumen-resenas__barras > div { display: grid; grid-template-columns: 24px 1fr 20px; gap: 8px; align-items: center; }
+.mes { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.mes__sem { text-align: center; font-size: 10px; color: #6b6f8d; }
+.mes__dia { position: relative; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid var(--portal-borde); border-radius: 8px; background: #fff; font-size: 12px; color: var(--color-tinta); }
+.mes__dia i { position: absolute; right: 3px; bottom: 3px; min-width: 14px; padding: 0 3px; border-radius: 999px; background: var(--portal-morado); color: #fff; font-size: 9px; font-style: normal; line-height: 14px; text-align: center; }
+.mes__dia--hoy { border-color: var(--portal-morado); font-weight: 700; }
+.mes__dia--sel { background: var(--portal-morado); border-color: var(--portal-morado); color: #fff; }
+.mes__dia--sel i { background: #fff; color: var(--portal-morado); }

@@ -30,6 +30,20 @@ export default function Resenas() {
     <div className="p-estrecho">
       <h1 className="p-titulo">Reseñas</h1>
       {error && <Aviso onClose={() => setError('')}>{error}</Aviso>}
+      {lista && lista.length > 0 && (() => {
+        const prom = lista.reduce((n, r) => n + r.calificacion, 0) / lista.length;
+        return (
+          <div className="p-tarjeta resumen-resenas">
+            <div><strong className="resumen-resenas__n">{prom.toFixed(1)}</strong><Estrellas valor={prom} /><small>{lista.length} reseña{lista.length === 1 ? '' : 's'} · {lista.filter((r) => !r.respuesta).length} sin responder</small></div>
+            <div className="resumen-resenas__barras">
+              {[5, 4, 3, 2, 1].map((n) => {
+                const c = lista.filter((r) => r.calificacion === n).length;
+                return <div key={n}><small>{n}★</small><span className="p-medidor"><span style={{ width: `${(c / lista.length) * 100}%` }} /></span><small>{c}</small></div>;
+              })}
+            </div>
+          </div>
+        );
+      })()}
       {lista && lista.length === 0 && <p className="p-sub">Aún no tienes reseñas.</p>}
       {lista?.map((r) => (
         <div key={r.id} className="cita">

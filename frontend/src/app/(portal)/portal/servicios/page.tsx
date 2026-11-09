@@ -14,6 +14,8 @@ export default function Servicios() {
   const [lista, setLista] = useState<Servicio[] | null>(null);
   const [form, setForm] = useState<Form | null>(null);
   const [error, setError] = useState('');
+  const [tab, setTab] = useState<'todos' | 'publicados' | 'ocultos'>('todos');
+  const [q, setQ] = useState('');
   const cargar = useCallback(() => api<Servicio[]>('/proveedor/servicios').then(setLista).catch((e: Error) => { setError(e.message); setLista([]); }), []);
   useEffect(() => { cargar(); }, [cargar]);
 
@@ -77,10 +79,23 @@ export default function Servicios() {
         <button type="button" className="p-btn" onClick={() => setForm(VACIO)}>Agregar servicio</button>
       )}
 
+      {lista && lista.length > 0 && (
+        <>
+          <div className="stats">
+            <div className="stat"><strong>{lista.filter((x) => x.activo).length}</strong><small>Servicios publicados</small></div>
+            <div className="stat"><strong>{lista.filter((x) => !x.activo).length}</strong><small>Servicios ocultos</small></div>
+            <div className="stat"><strong>{lista.length}</strong><small>Total</small></div>
+          </div>
+          <div className="tabs" role="tablist">
+            {(['todos', 'publicados', 'ocultos'] as const).map((t) => <button key={t} type="button" aria-pressed={tab === t} onClick={() => setTab(t)}>{t[0].toUpperCase() + t.slice(1)}</button>)}
+          </div>
+          <input type="search" className="p-buscar" placeholder="Buscar servicio" aria-label="Buscar servicio" value={q} onChange={(e) => setQ(e.target.value)} />
+        </>
+      )}
       {lista && lista.length === 0 && !form && <p className="p-sub">Aún no tienes servicios. Agrega el primero.</p>}
       {lista && lista.length > 0 && (
         <div className="grupo">
-          {lista.map((s) => (
+          {lista.filter((x) => (tab === 'todos' || (tab === 'publicados') === x.activo) && x.nombre.toLowerCase().includes(q.toLowerCase())).map((s) => (
             <div key={s.id} className="servicio-fila" style={{ opacity: s.activo ? 1 : 0.55 }}>
               <span><strong>{s.nombre}</strong><small>{pesos(s.precio)} · {s.duracionMin} min{s.activo ? '' : ' · oculto'}</small></span>
               <span className="cita__acciones">
