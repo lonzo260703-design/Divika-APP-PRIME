@@ -15,7 +15,7 @@ const ITEMS = [
 export function BottomNav() {
   const ruta = usePathname();
   // Categorías y detalle de negocio cuelgan de Inicio
-  const activo = (href: string) => ruta === href || (href === '/home' && /^\/(categoria|negocio)\//.test(ruta));
+  const activo = (href: string) => ruta === href || (href === '/perfil' && ruta.startsWith('/perfil/')) || (href === '/home' && /^\/(categoria|negocio)\//.test(ruta));
   return (
     <nav className="nav" aria-label="Navegación principal">
       {ITEMS.map(({ nombre, icono, href }) => (

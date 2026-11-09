@@ -65,3 +65,8 @@ export const IconScissors = () => <Icono width="18" height="18"><circle cx="6" c
 export const IconClipboard = () => <Icono width="18" height="18"><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4h6v3H9zM9 12h6M9 16h4" /></Icono>;
 export const IconExternal = () => <Icono width="14" height="14"><path d="M14 4h6v6M20 4 10 14M18 14v6H4V6h6" /></Icono>;
 export const IconMenu = () => <Icono><path d="M4 7h16M4 12h16M4 17h16" /></Icono>;
+export const IconCamera = () => <Icono width="14" height="14"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /></Icono>;
+export const IconDownload = () => <Icono><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></Icono>;
+export const IconHistory = () => <Icono><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v5l3 2" /></Icono>;
+export const IconDoc = () => <Icono><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" /></Icono>;
+export const IconWarning = () => <Icono width="30" height="30"><path d="M12 3 2 20h20zM12 10v5M12 18h.01" /></Icono>;

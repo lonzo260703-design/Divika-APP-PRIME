@@ -4,6 +4,7 @@ export type Usuario = {
   id: number;
   nombre: string;
   apellidos?: string | null;
+  avatarUrl?: string | null;
   email: string;
   rol: Rol;
   telefono?: string | null;
@@ -59,4 +60,25 @@ export type Resena = {
   comentario: string | null;
   creadoEn: string;
   usuario: { id: number; nombre: string };
+};
+
+// Datos completos de la cuenta (GET /cuenta)
+export type Preferencias = {
+  notificaciones: { push: boolean; correo: boolean; sms: boolean; recordatorios: boolean; promociones: boolean; novedades: boolean };
+  privacidad: { mostrarFoto: boolean; compartirUbicacion: boolean; personalizar: boolean };
+};
+
+export type Cuenta = {
+  id: number;
+  nombre: string;
+  apellidos: string | null;
+  email: string;
+  rol: Rol;
+  telefono: string | null;
+  telefonoVerificado: boolean;
+  fechaNacimiento: string | null;
+  ciudad: string | null;
+  avatarUrl: string | null;
+  tienePassword: boolean;
+  preferencias: Preferencias;
 };
