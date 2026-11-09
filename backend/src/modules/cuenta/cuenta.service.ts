@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { unlink } from 'fs/promises';
@@ -27,7 +27,7 @@ export class CuentaService {
 
   private async usuario(id: number) {
     const u = await this.repo.findOneBy({ id });
-    if (!u) throw new NotFoundException('Usuario no encontrado');
+    if (!u) throw new UnauthorizedException('Usuario no encontrado');
     return u;
   }
 
