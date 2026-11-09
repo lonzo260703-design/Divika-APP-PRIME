@@ -175,4 +175,4 @@ Esta sección es para quien implemente el backend en otra tecnología (por ejemp
 Las rutas nuevas que pide el diseño web están en [`api-portal-proveedor.md`](api-portal-proveedor.md).
 
 ## Aún sin pantalla en el frontend
-`/favoritos`, `/negocios/cercanos`, `/auth/me`, `PUT/DELETE /negocios`, `POST /resenas`. Existen en este backend por si se necesitan.
+`/negocios/cercanos`, `/auth/me`, `PUT/DELETE /negocios`. Existen en este backend por si se necesitan. Resumen general para el equipo de backend: [`resumen-para-backend.md`](resumen-para-backend.md).
