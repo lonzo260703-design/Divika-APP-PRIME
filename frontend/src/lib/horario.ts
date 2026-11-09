@@ -29,3 +29,15 @@ export function resumenHorario(horarios: Record<string, HorarioDia> | null): str
     return `${dias} · ${g.texto}`;
   });
 }
+
+// ¿Está abierto en este momento? (null si el negocio no capturó horario)
+export function abiertoAhora(horarios: Record<string, HorarioDia> | null, ahora = new Date()): boolean | null {
+  if (!horarios) return null;
+  const clave = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'][ahora.getDay()];
+  const d = horarios[clave];
+  if (!d) return null;
+  if (d.cerrado) return false;
+  const min = ahora.getHours() * 60 + ahora.getMinutes();
+  const aMin = (h: string) => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
+  return min >= aMin(d.apertura) && min < aMin(d.cierre);
+}

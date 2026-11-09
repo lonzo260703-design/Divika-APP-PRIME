@@ -303,7 +303,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ---------- Detalle de negocio ---------- */
 .screen:has(.detalle) { padding: 0; gap: 0; position: relative; }
 .detalle__hero { position: relative; height: 220px; background: var(--color-gris); }
-.detalle__hero img, .detalle__hero > div { width: 100%; height: 100%; object-fit: cover; display: grid; place-items: center; }
+.detalle__hero img, .detalle__hero > .card__image--vacio { width: 100%; height: 100%; object-fit: cover; display: grid; place-items: center; }
 .detalle__atras { position: absolute; top: var(--espacio-3); left: var(--espacio-3); width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--color-primario); box-shadow: var(--sombra); }
 .detalle__cuerpo { display: flex; flex-direction: column; gap: var(--espacio-3); padding: var(--espacio-4); }
 .detalle__titulo { display: flex; align-items: center; justify-content: space-between; gap: var(--espacio-2); }
@@ -395,3 +395,28 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .tarjeta-pago__fila { display: flex; align-items: center; gap: var(--espacio-3); font-size: 12px; }
 .tarjeta-pago small { display: block; font-size: 10px; color: #777; }
 .etiqueta-chica { padding: 2px 8px; border-radius: 6px; background: var(--color-categorias); font-size: 9px; font-weight: 700; }
+
+/* ---------- Favoritos y detalle (corazón, compartir, galería, barra de reserva) ---------- */
+.fav-card { position: relative; }
+.fav-card__corazon { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(255,255,255,.95); color: var(--color-acento); box-shadow: var(--sombra); }
+.fav-vacio { display: flex; flex-direction: column; align-items: center; gap: var(--espacio-2); padding: var(--espacio-5) 0; text-align: center; color: var(--color-primario); }
+.fav-vacio__icono { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--color-categorias); }
+.fav-vacio h2 { font-size: 16px; }
+.fav-vacio p { font-size: 12px; color: #666; }
+.toast--accion { display: flex; align-items: center; justify-content: space-between; gap: var(--espacio-3); text-align: left; }
+.toast--accion button { border: 0; background: none; color: #fff; font-weight: 800; font-size: 12px; text-decoration: underline; }
+.detalle__acciones { position: absolute; top: var(--espacio-3); right: var(--espacio-3); display: flex; gap: var(--espacio-2); }
+.detalle__acciones button { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--color-primario); box-shadow: var(--sombra); }
+.detalle__acciones .activo { color: var(--color-acento); }
+.detalle__chips { display: flex; flex-wrap: wrap; gap: var(--espacio-2); align-items: center; }
+.chip-estado { padding: 4px 8px; border-radius: 999px; background: #e3f4e8; color: #1f7a3a; font-size: 11px; font-weight: 700; }
+.chip-estado--cerrado { background: #fdeae6; color: var(--color-acento); }
+.chip-calif { padding: 4px 8px; border-radius: 999px; background: var(--color-categorias); color: var(--color-primario); font-size: 11px; font-weight: 700; }
+.galeria { display: flex; gap: var(--espacio-2); overflow-x: auto; padding: var(--espacio-2) var(--espacio-4) 0; }
+.galeria button { flex: none; width: 64px; height: 64px; padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: var(--color-gris); }
+.galeria button[aria-current=true] { border-color: var(--color-primario); }
+.galeria img { width: 100%; height: 100%; object-fit: cover; }
+.barra-reserva { position: sticky; bottom: 78px; display: flex; align-items: center; justify-content: space-between; gap: var(--espacio-3); margin: 0 var(--espacio-4) var(--espacio-3); padding: var(--espacio-3); border-radius: var(--radio); background: var(--color-superficie); box-shadow: 0 4px 18px rgba(0,0,0,.18); }
+.barra-reserva small { display: block; font-size: 10px; color: #777; }
+.barra-reserva strong { font-size: 13px; color: var(--color-primario); }
+.barra-reserva .btn { width: auto; padding-inline: var(--espacio-5); }

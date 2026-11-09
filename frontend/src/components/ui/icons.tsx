@@ -70,3 +70,5 @@ export const IconDownload = () => <Icono><path d="M12 4v11M7 11l5 5 5-5M5 20h14"
 export const IconHistory = () => <Icono><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v5l3 2" /></Icono>;
 export const IconDoc = () => <Icono><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" /></Icono>;
 export const IconWarning = () => <Icono width="30" height="30"><path d="M12 3 2 20h20zM12 10v5M12 18h.01" /></Icono>;
+export const IconShare = () => <Icono><path d="M12 15V4M8 8l4-4 4 4M5 12v8h14v-8" /></Icono>;
+export const IconHeartFill = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z" /></svg>;

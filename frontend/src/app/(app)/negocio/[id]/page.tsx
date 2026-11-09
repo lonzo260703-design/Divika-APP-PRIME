@@ -3,10 +3,12 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Estrellas } from '@/components/negocio/Estrellas';
-import { IconBack, IconChat, IconChevron, IconClock, IconPhone, IconPin } from '@/components/ui/icons';
+import { Button } from '@/components/ui/Button';
+import { IconBack, IconChat, IconChevron, IconClock, IconHeart, IconHeartFill, IconPhone, IconPin, IconShare } from '@/components/ui/icons';
 import { api } from '@/lib/api';
 import { formatoTelefono, numeroWhatsapp } from '@/lib/formato';
-import { resumenHorario } from '@/lib/horario';
+import { abiertoAhora, resumenHorario } from '@/lib/horario';
+import { useFavoritos } from '@/lib/useFavoritos';
 import type { NegocioDetalle, Resena } from '@/types';
 
 const UMBRAL_BIEN_CALIFICADO = 4.5;
@@ -18,6 +20,8 @@ export default function NegocioPage() {
   const [resenas, setResenas] = useState<Resena[]>([]);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
+  const [foto, setFoto] = useState(0);
+  const favs = useFavoritos();
 
   useEffect(() => {
     api<NegocioDetalle>(`/negocios/${id}`).then(setNegocio).catch((e: Error) => setError(e.message));
@@ -33,6 +37,15 @@ export default function NegocioPage() {
     api(`/negocios/${id}/clic-${tipo}`, { method: 'POST' }).catch(() => {});
   };
 
+  async function compartir() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: negocio?.nombre, url });
+      else { await navigator.clipboard.writeText(url); proximamenteAviso('Enlace copiado'); }
+    } catch {}
+  }
+  const proximamenteAviso = (txt: string) => { setAviso(txt); setTimeout(() => setAviso(''), 2500); };
+
   if (error) {
     return (
       <>
@@ -44,6 +57,9 @@ export default function NegocioPage() {
   if (!negocio) return null;
 
   const horario = resumenHorario(negocio.horariosJson);
+  const abierto = abiertoAhora(negocio.horariosJson);
+  const fotos = [negocio.imagenUrl, ...(negocio.galeria ?? [])].filter((u): u is string => !!u);
+  const esFav = favs.esFavorito(negocio.id);
   const bien = negocio.calificacion >= UMBRAL_BIEN_CALIFICADO;
   const mapa =
     negocio.latitud != null && negocio.longitud != null
@@ -53,9 +69,28 @@ export default function NegocioPage() {
   return (
     <div className="detalle">
       <div className="detalle__hero">
-        {negocio.imagenUrl ? <img src={negocio.imagenUrl} alt={negocio.nombre} /> : <div className="card__image--vacio">🖼️</div>}
+        {fotos[foto] ? <img src={fotos[foto]} alt={negocio.nombre} /> : <div className="card__image--vacio">🖼️</div>}
         <button type="button" className="detalle__atras" onClick={volver} aria-label="Volver"><IconBack /></button>
+        <div className="detalle__acciones">
+          <button type="button" onClick={compartir} aria-label="Compartir"><IconShare /></button>
+          <button
+            type="button"
+            className={esFav ? 'activo' : undefined}
+            aria-pressed={esFav}
+            aria-label={esFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+            onClick={() => (esFav ? favs.quitar(negocio.id) : favs.agregar(negocio))}
+          >
+            {esFav ? <IconHeartFill /> : <IconHeart />}
+          </button>
+        </div>
       </div>
+      {fotos.length > 1 && (
+        <div className="galeria">
+          {fotos.map((u, i) => (
+            <button key={u} type="button" aria-current={i === foto} aria-label={`Foto ${i + 1}`} onClick={() => setFoto(i)}><img src={u} alt="" /></button>
+          ))}
+        </div>
+      )}
 
       <div className="detalle__cuerpo">
         <div className="detalle__titulo">
@@ -70,9 +105,9 @@ export default function NegocioPage() {
             <div>{horario.map((l) => <p key={l}>{l}</p>)}</div>
           </div>
         )}
-        <div className="detalle__calif">
-          <Estrellas valor={negocio.calificacion} />
-          <strong>{negocio.calificacion.toFixed(1)}</strong>
+        <div className="detalle__chips">
+          <span className="chip-calif">★ {negocio.calificacion.toFixed(1)}</span>
+          {abierto !== null && <span className={`chip-estado${abierto ? '' : ' chip-estado--cerrado'}`}>{abierto ? 'Abierto' : 'Cerrado'}</span>}
         </div>
 
         <section className="bloque">
@@ -122,12 +157,10 @@ export default function NegocioPage() {
           )}
         </section>
 
-        <section className="bloque">
-          <h2>Reservar</h2>
-          <button type="button" className="enlace-fila" onClick={() => proximamente('Reservar')}>
-            Ver fechas <IconChevron />
-          </button>
-        </section>
+      </div>
+      <div className="barra-reserva">
+        <span><small>Agenda tu cita</small><strong>Reserva en línea</strong></span>
+        <Button onClick={() => proximamente('Reservar')}>Ver fechas</Button>
       </div>
       {aviso && <div className="toast" role="status">{aviso}</div>}
     </div>
