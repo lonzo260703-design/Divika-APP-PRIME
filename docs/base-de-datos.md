@@ -8,6 +8,7 @@ erDiagram
   usuarios ||--o{ resenas : escribe
   negocios ||--o{ resenas : recibe
   usuarios ||--o{ favoritos : marca
+  usuarios ||--o{ reportes_problema : envia
   negocios ||--o{ favoritos : "es marcado"
 
   usuarios {
@@ -19,10 +20,22 @@ erDiagram
     string rol "cliente | negocio"
     string telefono UK
     bool telefonoVerificado
+    string telefonoPendiente "numero por confirmar con codigo"
+    string fechaNacimiento "AAAA-MM-DD"
+    string ciudad
+    string avatarUrl
+    json preferencias "notificaciones y privacidad"
     string codigoOtp
     date otpExpiraEn
     string googleId UK
     string appleId UK
+    date creadoEn
+  }
+  reportes_problema {
+    int id PK
+    string tipo "aplicacion | reserva | pagos | cancelaciones | servicio | otro"
+    string descripcion "max 1000"
+    int usuarioId FK
     date creadoEn
   }
   negocios {

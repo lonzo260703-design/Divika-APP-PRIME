@@ -63,6 +63,25 @@ Solo los negocios `publicado` salen en `/negocios`, `/negocios/top` y `/negocios
 |---|---|---|
 | POST | `/proveedores/interesados` | Formulario "Únete gratis" de la landing, sin sesión: `{ nombreNegocio, servicio, telefono, ciudad }`. Responde `{ ok: true }` |
 
+## Cuenta del cliente 🔒
+Pantallas de Perfil (editar, seguridad, notificaciones, privacidad, reportar problema, eliminar cuenta). Todas requieren sesión.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET 🔒 | `/cuenta` | Perfil completo: `id, nombre, apellidos, email, rol, telefono, telefonoVerificado, fechaNacimiento (AAAA-MM-DD), ciudad, avatarUrl, tienePassword, preferencias` |
+| PUT 🔒 | `/cuenta` | `{ nombre?, email?, fechaNacimiento?, ciudad? }`. Devuelve el perfil. El correo se cambia sin código de verificación (pendiente de correo real) |
+| POST 🔒 | `/cuenta/foto` | `multipart/form-data`, campo `foto` (JPG/PNG, máx. 10 MB). Devuelve el perfil con `avatarUrl` absoluta |
+| DELETE 🔒 | `/cuenta/foto` | Quita la foto |
+| POST 🔒 | `/cuenta/contrasena` | `{ actual, nueva }`; nueva: mínimo 8 caracteres, una mayúscula y un número |
+| POST 🔒 | `/cuenta/telefono/codigo` | `{ telefono }` (10 dígitos). Envía código de 4 dígitos (simulado en consola). Responde `{ enviado, segundosEspera: 60 }` |
+| POST 🔒 | `/cuenta/telefono/verificar` | `{ telefono, codigo }`. Si coincide, guarda el teléfono como verificado y devuelve el perfil |
+| GET / PUT 🔒 | `/cuenta/preferencias` | `{ notificaciones: { push, correo, sms, recordatorios, promociones, novedades }, privacidad: { mostrarFoto, compartirUbicacion, personalizar } }`. PUT acepta parcial |
+| GET 🔒 | `/cuenta/datos` | Exportación JSON de los datos del usuario (cuenta, reseñas, favoritos) |
+| DELETE 🔒 | `/cuenta` | Elimina la cuenta y sus datos. 403 si es proveedor (rol `negocio`) |
+| POST 🔒 | `/soporte/reportes` | `{ tipo: aplicacion\|reserva\|pagos\|cancelaciones\|servicio\|otro, descripcion (máx. 1000) }` |
+
+Sin backend todavía (el front las muestra como "próximamente" o demo): verificación en dos pasos, dispositivos conectados, adjuntar imagen en reportes, formas de pago (demo, sin datos reales de tarjeta).
+
 ## Favoritos
 | Método | Ruta | Descripción |
 |---|---|---|
