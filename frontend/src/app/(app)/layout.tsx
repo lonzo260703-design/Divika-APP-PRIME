@@ -3,12 +3,15 @@
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { MarcoWeb } from '@/components/web/MarcoWeb';
 import { getToken } from '@/lib/auth';
+import { useEscritorio } from '@/lib/useEscritorio';
 
 // Protege TODAS las pantallas de este grupo: sin sesión te manda al inicio
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [listo, setListo] = useState(false);
+  const escritorio = useEscritorio();
 
   useEffect(() => {
     // Sin sesión: en celular al inicio; en escritorio a la pantalla de acceso (el inicio web es público)
@@ -16,7 +19,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     else setListo(true);
   }, [router]);
 
-  if (!listo) return null;
+  if (!listo || escritorio === null) return null;
+  if (escritorio) return <MarcoWeb>{children}</MarcoWeb>;
 
   return (
     <>

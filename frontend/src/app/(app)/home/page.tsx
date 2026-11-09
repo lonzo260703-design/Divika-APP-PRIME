@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { NegocioCard } from '@/components/negocio/NegocioCard';
+import { LandingContenido } from '@/components/web/LandingWeb';
+import { ListadoWeb } from '@/components/web/ListadoWeb';
+import { useEscritorio } from '@/lib/useEscritorio';
 import { PromoBanner } from '@/components/home/PromoBanner';
 import { TopTenItem } from '@/components/negocio/TopTenItem';
 import { IconPin } from '@/components/ui/icons';
@@ -12,7 +15,7 @@ import { api } from '@/lib/api';
 import { useCategorias } from '@/lib/categorias';
 import type { Negocio } from '@/types';
 
-export default function HomePage() {
+function HomeMovil() {
   const router = useRouter();
   const { categorias } = useCategorias();
   const [buscar, setBuscar] = useState('');
@@ -74,4 +77,15 @@ export default function HomePage() {
       </section>
     </>
   );
+}
+
+
+export default function HomePage() {
+  const escritorio = useEscritorio();
+  const [consulta, setConsulta] = useState<string | null>(null);
+  useEffect(() => { setConsulta(new URLSearchParams(window.location.search).get('buscar') ?? ''); }, []);
+  if (escritorio === null || consulta === null) return null;
+  if (!escritorio) return <HomeMovil />;
+  // En escritorio, con búsqueda se muestran resultados; sin ella, el inicio web
+  return consulta ? <ListadoWeb consulta={consulta} /> : <LandingContenido />;
 }

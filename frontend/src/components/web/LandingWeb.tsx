@@ -13,8 +13,8 @@ import { api } from '@/lib/api';
 import { useCategorias } from '@/lib/categorias';
 import type { Negocio } from '@/types';
 
-// Inicio de la versión web (pública: se ve sin iniciar sesión)
-export function LandingWeb() {
+// Contenido del inicio web (sin cabecera ni pie: los pone quien lo use)
+export function LandingContenido() {
   const router = useRouter();
   const { categorias } = useCategorias();
   const [recomendados, setRecomendados] = useState<Negocio[]>([]);
@@ -32,9 +32,7 @@ export function LandingWeb() {
   }
 
   return (
-    <div className="web-pagina">
-      <Cabecera />
-
+    <>
       <section className="web-hero">
         <div className="web-hero__texto">
           <h1>
@@ -86,6 +84,16 @@ export function LandingWeb() {
         </div>
       </section>
 
+    </>
+  );
+}
+
+// Inicio de la versión web (pública: se ve sin iniciar sesión)
+export function LandingWeb() {
+  return (
+    <div className="web-pagina">
+      <Cabecera />
+      <LandingContenido />
       <Pie />
     </div>
   );

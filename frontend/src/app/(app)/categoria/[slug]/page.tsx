@@ -2,6 +2,8 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ListadoWeb } from '@/components/web/ListadoWeb';
+import { useEscritorio } from '@/lib/useEscritorio';
 import { Atras } from '@/components/layout/Atras';
 import { NegocioGridCard } from '@/components/negocio/NegocioGridCard';
 import { IconSort } from '@/components/ui/icons';
@@ -13,7 +15,7 @@ import type { Negocio } from '@/types';
 
 type Ubicacion = { lat: number; lng: number };
 
-export default function CategoriaPage() {
+function CategoriaMovil() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const { categorias, cargando } = useCategorias();
@@ -110,4 +112,12 @@ export default function CategoriaPage() {
       </div>
     </>
   );
+}
+
+
+export default function CategoriaPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const escritorio = useEscritorio();
+  if (escritorio === null) return null;
+  return escritorio ? <ListadoWeb key={slug} slug={slug} /> : <CategoriaMovil />;
 }

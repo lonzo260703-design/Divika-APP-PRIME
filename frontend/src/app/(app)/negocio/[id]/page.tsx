@@ -2,6 +2,8 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { NegocioWeb } from '@/components/web/NegocioWeb';
+import { useEscritorio } from '@/lib/useEscritorio';
 import { Estrellas } from '@/components/negocio/Estrellas';
 import { Button } from '@/components/ui/Button';
 import { IconBack, IconChat, IconChevron, IconClock, IconHeart, IconHeartFill, IconPhone, IconPin, IconShare } from '@/components/ui/icons';
@@ -14,7 +16,7 @@ import type { NegocioDetalle, Resena, Servicio } from '@/types';
 
 const UMBRAL_BIEN_CALIFICADO = 4.5;
 
-export default function NegocioPage() {
+function NegocioMovil() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [negocio, setNegocio] = useState<NegocioDetalle | null>(null);
@@ -193,4 +195,12 @@ export default function NegocioPage() {
       {aviso && <div className="toast" role="status">{aviso}</div>}
     </div>
   );
+}
+
+
+export default function NegocioPage() {
+  const { id } = useParams<{ id: string }>();
+  const escritorio = useEscritorio();
+  if (escritorio === null) return null;
+  return escritorio ? <NegocioWeb key={id} id={id} /> : <NegocioMovil />;
 }
