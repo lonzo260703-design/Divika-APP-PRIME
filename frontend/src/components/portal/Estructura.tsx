@@ -19,7 +19,7 @@ export const SECCIONES = [
   { slug: 'solicitudes', nombre: 'Solicitudes y citas', icono: <IconClipboard /> },
   { slug: 'mensajes', nombre: 'Mensajes', icono: <IconChat /> },
   { slug: 'notificaciones', nombre: 'Notificaciones', icono: <IconBell /> },
-  { slug: 'resenas', nombre: 'Reseñas y ajustes', icono: <IconStar /> },
+  { slug: 'resenas', nombre: 'Reseñas', icono: <IconStar /> },
   { slug: 'seguridad', nombre: 'Seguridad', icono: <IconShield /> },
 ];
 

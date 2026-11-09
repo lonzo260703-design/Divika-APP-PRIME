@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
 import { ESTADO_TEXTO, iniciales, usePortal } from '@/components/portal/PortalContext';
-import { IconBell, IconCard, IconChevron, IconExternal, IconLogout, IconPin, IconShield, IconStore } from '@/components/ui/icons';
+import { IconBell, IconCard, IconChevron, IconExternal, IconLogout, IconPin, IconShield, IconStar, IconStore } from '@/components/ui/icons';
 import { cerrarSesion } from '@/lib/auth';
 
 // Pestaña "Perfil" de la app móvil del proveedor
@@ -14,6 +14,7 @@ export default function CuentaProveedor() {
   const nombre = [usuario.nombre, usuario.apellidos].filter(Boolean).join(' ');
   const opciones: [string, ReactNode, string][] = [
     ['Perfil del negocio', <IconStore key="a" />, '/portal/perfil'],
+    ['Reseñas', <IconStar key="r" />, '/portal/resenas'],
     ['Métodos de pago', <IconCard key="b" />, '/portal/pagos'],
     ['Ubicación y cobertura', <IconPin key="c" />, '/portal/cobertura'],
     ['Notificaciones', <IconBell key="d" />, '/portal/notificaciones'],

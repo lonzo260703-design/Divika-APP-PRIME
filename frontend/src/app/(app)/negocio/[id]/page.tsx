@@ -9,7 +9,8 @@ import { api } from '@/lib/api';
 import { formatoTelefono, numeroWhatsapp } from '@/lib/formato';
 import { abiertoAhora, resumenHorario } from '@/lib/horario';
 import { useFavoritos } from '@/lib/useFavoritos';
-import type { NegocioDetalle, Resena } from '@/types';
+import { pesos } from '@/lib/reservas';
+import type { NegocioDetalle, Resena, Servicio } from '@/types';
 
 const UMBRAL_BIEN_CALIFICADO = 4.5;
 
@@ -21,10 +22,12 @@ export default function NegocioPage() {
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [foto, setFoto] = useState(0);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
   const favs = useFavoritos();
 
   useEffect(() => {
     api<NegocioDetalle>(`/negocios/${id}`).then(setNegocio).catch((e: Error) => setError(e.message));
+    api<Servicio[]>(`/negocios/${id}/servicios`).then(setServicios).catch(() => setServicios([]));
     api<Resena[]>(`/resenas/negocio/${id}`).then(setResenas).catch(() => setResenas([]));
   }, [id]);
 
@@ -127,10 +130,22 @@ export default function NegocioPage() {
             </a>
           </div>
           <p className="detalle__tel">{formatoTelefono(negocio.telefono)}</p>
-          <button type="button" className="enlace-fila" onClick={() => proximamente('Enviar mensaje')}>
+          <button type="button" className="enlace-fila" onClick={() => router.push(`/negocio/${negocio.id}/mensajes`)}>
             Enviar mensaje <IconChevron />
           </button>
         </section>
+
+        {servicios.length > 0 && (
+          <section className="bloque">
+            <h2>Servicios</h2>
+            {servicios.map((s) => (
+              <div key={s.id} className="servicio-fila">
+                <span><strong>{s.nombre}</strong><small>{s.duracionMin} min{s.descripcion ? ` · ${s.descripcion}` : ''}</small></span>
+                <strong>{pesos(s.precio)}</strong>
+              </div>
+            ))}
+          </section>
+        )}
 
         <section className="bloque">
           <h2>Ubicación</h2>
@@ -147,6 +162,7 @@ export default function NegocioPage() {
               <div key={r.id} className="resena">
                 <div className="resena__cab"><strong>{r.usuario.nombre}</strong><Estrellas valor={r.calificacion} /></div>
                 {r.comentario && <p>{r.comentario}</p>}
+                {r.respuesta && <p className="resena__respuesta"><strong>Respuesta del negocio:</strong> {r.respuesta}</p>}
               </div>
             ))
           )}

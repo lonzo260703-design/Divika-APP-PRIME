@@ -62,6 +62,8 @@ export type Resena = {
   comentario: string | null;
   creadoEn: string;
   usuario: { id: number; nombre: string };
+  respuesta?: string | null;
+  respuestaEn?: string | null;
 };
 
 // Datos completos de la cuenta (GET /cuenta)
@@ -83,4 +85,31 @@ export type Cuenta = {
   avatarUrl: string | null;
   tienePassword: boolean;
   preferencias: Preferencias;
+};
+
+// Servicios, citas y mensajes
+export type Servicio = { id: number; nombre: string; descripcion: string | null; precio: number | null; duracionMin: number; activo: boolean };
+
+export type EstadoCita = 'solicitada' | 'confirmada' | 'propuesta' | 'rechazada' | 'cancelada';
+export type Cita = {
+  id: number;
+  estado: EstadoCita;
+  fecha: string; // AAAA-MM-DD
+  hora: string; // HH:MM
+  personas: number;
+  notas: string | null;
+  metodoPago: string | null;
+  propuestaFecha: string | null;
+  propuestaHora: string | null;
+  creadoEn: string;
+  servicio: { id: number; nombre: string; precio: number | null; duracionMin: number } | null;
+  negocio: { id: number; nombre: string; imagenUrl: string | null; direccion: string; telefono: string };
+  cliente: { id: number; nombre: string; telefono: string | null };
+};
+
+export type MensajeChat = { id: number; de: 'cliente' | 'negocio'; texto: string; creadoEn: string };
+export type Conversacion = {
+  con: { id: number; nombre: string; imagenUrl?: string | null };
+  ultimo: { texto: string; de: string; creadoEn: string };
+  sinLeer: number;
 };
