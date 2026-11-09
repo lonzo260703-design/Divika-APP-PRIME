@@ -160,7 +160,7 @@ export default function NegocioPage() {
       </div>
       <div className="barra-reserva">
         <span><small>Agenda tu cita</small><strong>Reserva en línea</strong></span>
-        <Button onClick={() => proximamente('Reservar')}>Ver fechas</Button>
+        <Button onClick={() => router.push(`/negocio/${negocio.id}/reservar`)}>Ver fechas</Button>
       </div>
       {aviso && <div className="toast" role="status">{aviso}</div>}
     </div>

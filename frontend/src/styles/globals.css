@@ -420,3 +420,22 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .barra-reserva small { display: block; font-size: 10px; color: #777; }
 .barra-reserva strong { font-size: 13px; color: var(--color-primario); }
 .barra-reserva .btn { width: auto; padding-inline: var(--espacio-5); }
+
+/* ---------- Reservar (demo) ---------- */
+.reservar { display: flex; flex-direction: column; gap: var(--espacio-3); padding: var(--espacio-4); }
+.pasos { display: flex; gap: 4px; list-style: none; padding: 0; margin: 0; }
+.pasos li { flex: 1; padding-top: 6px; border-top: 3px solid var(--color-borde); font-size: 10px; text-align: center; color: #888; }
+.pasos--actual, .pasos--hecho { border-color: var(--color-primario) !important; color: var(--color-primario) !important; font-weight: 700; }
+.dias { display: flex; gap: var(--espacio-2); overflow-x: auto; padding-bottom: 4px; }
+.dia { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 52px; padding: 8px 0; border: 1px solid var(--color-borde); border-radius: var(--radio); background: #fff; color: var(--color-primario); }
+.dia small { font-size: 10px; text-transform: capitalize; }
+.dia strong { font-size: 16px; }
+.dia:disabled { opacity: .35; }
+.dia--activo, .hora--activa { background: var(--color-primario); border-color: var(--color-primario); color: #fff; }
+.horas { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--espacio-2); }
+.hora { padding: 10px 0; border: 1px solid var(--color-borde); border-radius: var(--radio); background: #fff; color: var(--color-primario); font-size: 12px; font-weight: 600; }
+.hora:disabled { opacity: .35; text-decoration: line-through; }
+.contador { display: flex; align-items: center; justify-content: center; gap: var(--espacio-5); }
+.contador button { width: 44px; height: 44px; border: 1px solid var(--color-primario); border-radius: 50%; background: #fff; color: var(--color-primario); font-size: 22px; }
+.contador button:disabled { opacity: .35; }
+.contador strong { min-width: 40px; text-align: center; font-size: 32px; color: var(--color-primario); }
