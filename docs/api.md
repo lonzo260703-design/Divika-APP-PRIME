@@ -49,7 +49,7 @@ Para usuarios con `rol = 'negocio'`; siempre operan sobre su propio negocio.
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/proveedor/negocio` | Su negocio, con `estado` (`en_proceso`, `publicado`, `pausado`) |
-| PUT | `/proveedor/negocio` | `{ nombre?, categoria?, subcategoria?, descripcion? (máx. 600), telefono?, whatsapp?, emailPublico?, ciudad?, colonia? }` |
+| PUT | `/proveedor/negocio` | `{ nombre?, categoria?, subcategoria?, descripcion? (máx. 600), telefono?, whatsapp?, emailPublico?, ciudad?, colonia?, metodosPago? (efectivo\|transferencia\|tarjeta, solo informativo), cobertura? { radioKm 1-100, zonas[] máx. 15 } }` |
 | POST | `/proveedor/negocio/publicar` | Pasa a `publicado`. 422 si falta nombre, descripción, teléfono o al menos una foto |
 | POST | `/proveedor/negocio/pausar` | De `publicado` a `pausado` |
 | POST | `/proveedor/negocio/fotos` | `multipart/form-data`, campo `foto` (JPG o PNG, máx. 10 MB, hasta 10). Devuelve el negocio |
@@ -118,7 +118,7 @@ Esta sección es para quien implemente el backend en otra tecnología (por ejemp
 ## Formas de los datos
 **usuario:** `{ id, nombre, email, rol: 'cliente' | 'negocio', telefono?, telefonoVerificado? }`. Nunca debe incluir el hash de la contraseña ni el del código.
 
-**Negocio:** `id, nombre, descripcionCorta, categoria` (slug), `subcategoria, telefono` (10 dígitos), `direccion, latitud, longitud, horario, horariosJson, calificacion, imagenUrl, galeria, clicsWhatsapp, clicsLlamada, creadoEn`.
+**Negocio:** `id, nombre, descripcionCorta, categoria` (slug), `subcategoria, telefono` (10 dígitos), `direccion, latitud, longitud, horario, horariosJson, calificacion, imagenUrl, galeria, metodosPago, cobertura, clicsWhatsapp, clicsLlamada, creadoEn`.
 - `horariosJson` usa las claves `lunes, martes, miercoles, jueves, viernes, sabado, domingo` (sin acentos), cada una `{ apertura: "09:00", cierre: "19:00", cerrado: false }`. Es lo que pinta el horario del detalle.
 - `latitud` y `longitud` deben ser reales: de ahí salen el mapa y la distancia.
 - `imagenUrl` es una URL completa.

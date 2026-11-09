@@ -60,6 +60,8 @@ erDiagram
     float calificacion "promedio de resenas"
     string imagenUrl
     json galeria
+    json metodosPago "efectivo, transferencia, tarjeta"
+    json cobertura "radioKm y zonas"
     int clicsWhatsapp
     int clicsLlamada
     int ownerId FK
