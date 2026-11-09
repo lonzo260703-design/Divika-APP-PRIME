@@ -8,6 +8,7 @@ import { ResenasModule } from './modules/resenas/resenas.module';
 import { CuentaModule } from './modules/cuenta/cuenta.module';
 import { ProveedoresModule } from './modules/proveedores/proveedores.module';
 import { UsuariosModule } from './modules/usuarios/usuarios.module';
+import { AgendaModule } from './modules/agenda/agenda.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UsuariosModule } from './modules/usuarios/usuarios.module';
     FavoritosModule,
     ProveedoresModule,
     CuentaModule,
+    AgendaModule,
   ],
 })
 export class AppModule {}

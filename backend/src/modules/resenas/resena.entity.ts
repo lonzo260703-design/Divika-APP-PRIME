@@ -13,6 +13,13 @@ export class Resena {
   @Column({ type: 'text', nullable: true })
   comentario: string;
 
+  // Respuesta pública del negocio
+  @Column({ type: 'text', nullable: true })
+  respuesta: string | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  respuestaEn: Date | null;
+
   // Relación con el usuario que redacta la reseña (asegura que sea un usuario válido/autenticado)
   @ManyToOne(() => Usuario, { onDelete: 'CASCADE' })
   usuario: Usuario;
