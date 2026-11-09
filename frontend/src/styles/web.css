@@ -326,7 +326,7 @@
 .p-ancho { max-width: none; }
 @media (min-width: 900px) {
   .p-dos { grid-template-columns: 1.4fr 1fr; }
-  .stats--4 { grid-template-columns: repeat(4, 1fr); }
+  .stats--4 { grid-template-columns: repeat(5, 1fr); }
   .p-maestro { grid-template-columns: 340px 1fr; }
   .p-maestro--sel .p-lista-solo-movil { display: none; }
 }
@@ -367,3 +367,7 @@
 .disp-bloqueo { display: flex; flex-wrap: wrap; gap: var(--espacio-2); align-items: center; padding: 6px 0; border-top: 1px solid var(--portal-borde); }
 .disp-bloqueo input { padding: 6px 8px; border: 1px solid var(--portal-borde); border-radius: 8px; font: inherit; font-size: 12px; }
 .mes__dia--bloq { background: repeating-linear-gradient(45deg, #f3f3f8, #f3f3f8 4px, #e6e6f0 4px, #e6e6f0 8px); color: #9a9ab5; }
+
+/* Visitas al perfil */
+.p-barras { display: flex; align-items: flex-end; gap: 4px; height: 90px; margin-top: 8px; }
+.p-barras span { flex: 1; background: var(--color-primario, #0b6b5d); border-radius: 4px 4px 0 0; min-height: 4px; opacity: .85; }

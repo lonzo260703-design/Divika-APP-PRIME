@@ -55,6 +55,11 @@ export class NegociosController {
     return this.service.uno(id);
   }
 
+  @Post(':id/visita')
+  visita(@Param('id', ParseIntPipe) id: number) {
+    return this.service.registrarVisita(id);
+  }
+
   @Post(':id/clic-whatsapp')
   clicWhatsapp(@Param('id', ParseIntPipe) id: number) {
     return this.service.registrarClicWhatsapp(id);

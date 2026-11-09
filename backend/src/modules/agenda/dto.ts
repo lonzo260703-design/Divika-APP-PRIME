@@ -31,6 +31,27 @@ export class ServicioDto {
 
   @IsOptional()
   activo?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(60, { message: 'La categoría puede tener máximo 60 caracteres' })
+  categoria?: string;
+
+  @IsOptional()
+  @IsIn(['local', 'domicilio', 'ambos'], { message: 'Modalidad no válida' })
+  modalidad?: 'local' | 'domicilio' | 'ambos';
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'El costo de traslado debe ser un número' })
+  @Min(0, { message: 'El costo de traslado no puede ser negativo' })
+  @Max(100000, { message: 'El costo de traslado es demasiado alto' })
+  costoTraslado?: number | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(400, { message: 'Las indicaciones pueden tener máximo 400 caracteres' })
+  indicaciones?: string;
 }
 
 export class CrearCitaDto {

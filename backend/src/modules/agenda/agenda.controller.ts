@@ -1,9 +1,20 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { randomUUID } from 'crypto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { CARPETA_FOTOS } from '../proveedores/negocio-proveedor.service';
 import { JwtAuthGuard } from '../../common/jwt-auth.guard';
 import { AgendaService } from './agenda.service';
 import { CrearCitaDto, DisponibilidadDto, MensajeDto, ProponerHorarioDto, RespuestaResenaDto, ServicioDto } from './dto';
 
 type Req_ = { user: { sub: number } };
+
+const subidaServicio = FileInterceptor('foto', {
+  storage: diskStorage({ destination: CARPETA_FOTOS, filename: (_req, file, cb) => cb(null, `${randomUUID()}${extname(file.originalname).toLowerCase()}`) }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => (/^image\/(jpeg|png)$/.test(file.mimetype) ? cb(null, true) : cb(new BadRequestException('Solo se aceptan fotos JPG o PNG'), false)),
+});
 
 // Lo que ve cualquier visitante
 @Controller('negocios')
@@ -77,6 +88,18 @@ export class AgendaProveedorController {
   @Put('servicios/:id')
   editarServicio(@Req() r: Req_, @Param('id', ParseIntPipe) id: number, @Body() dto: ServicioDto) {
     return this.s.actualizarServicio(r.user.sub, id, dto);
+  }
+  // multipart/form-data con el campo "foto" (JPG o PNG, máx. 10 MB)
+  @Post('servicios/:id/foto')
+  @UseInterceptors(subidaServicio)
+  fotoServicio(@Req() r: Req_, @Param('id', ParseIntPipe) id: number, @UploadedFile() foto?: Express.Multer.File) {
+    if (!foto) throw new BadRequestException('Selecciona una foto (JPG o PNG, máx. 10 MB)');
+    const base = process.env.PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 3001}`;
+    return this.s.fotoServicio(r.user.sub, id, `${base}/uploads/${foto.filename}`);
+  }
+  @Delete('servicios/:id/foto')
+  quitarFotoServicio(@Req() r: Req_, @Param('id', ParseIntPipe) id: number) {
+    return this.s.fotoServicio(r.user.sub, id, null);
   }
   @Delete('servicios/:id')
   borrarServicio(@Req() r: Req_, @Param('id', ParseIntPipe) id: number) {

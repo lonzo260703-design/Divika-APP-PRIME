@@ -60,9 +60,26 @@ export class AgendaService {
     return this.servicios.find({ where: { negocio: { id: n.id } }, order: { creadoEn: 'ASC' } });
   }
 
+  private datosServicio(n: Negocio, dto: ServicioDto) {
+    const modalidad = dto.modalidad ?? 'local';
+    if (modalidad !== 'local' && !n.atiendeDomicilio) {
+      throw new BadRequestException('Para ofrecer servicio a domicilio activa “Atiendo a domicilio” en Ubicación y cobertura');
+    }
+    return {
+      nombre: dto.nombre,
+      descripcion: dto.descripcion ?? null,
+      precio: dto.precio ?? null,
+      duracionMin: dto.duracionMin,
+      categoria: dto.categoria?.trim() || null,
+      modalidad,
+      costoTraslado: modalidad === 'local' ? null : dto.costoTraslado ?? null,
+      indicaciones: dto.indicaciones?.trim() || null,
+    } as const;
+  }
+
   async crearServicio(userId: number, dto: ServicioDto) {
     const n = await this.negocioDe(userId);
-    return this.servicios.save(this.servicios.create({ ...dto, descripcion: dto.descripcion ?? null, precio: dto.precio ?? null, activo: dto.activo ?? true, negocio: n }));
+    return this.servicios.save(this.servicios.create({ ...this.datosServicio(n, dto), activo: dto.activo ?? true, negocio: n }));
   }
 
   private async servicioMio(userId: number, id: number) {
@@ -74,7 +91,14 @@ export class AgendaService {
 
   async actualizarServicio(userId: number, id: number, dto: ServicioDto) {
     const s = await this.servicioMio(userId, id);
-    Object.assign(s, { ...dto, descripcion: dto.descripcion ?? null, precio: dto.precio ?? null, activo: dto.activo ?? s.activo });
+    const n = await this.negocioDe(userId);
+    Object.assign(s, this.datosServicio(n, dto), { activo: dto.activo ?? s.activo });
+    return this.servicios.save(s);
+  }
+
+  async fotoServicio(userId: number, id: number, url: string | null) {
+    const s = await this.servicioMio(userId, id);
+    s.fotoUrl = url;
     return this.servicios.save(s);
   }
 

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
 import { Repository } from 'typeorm';
+import { ahoraLocal } from '../agenda/disponibilidad';
 import { subcategoriaValida } from '../negocios/categorias';
 import { Negocio } from '../negocios/negocio.entity';
 import { ActualizarPerfilDto } from './negocio-proveedor.dto';
@@ -15,14 +16,40 @@ export const CARPETA_FOTOS = join(process.cwd(), 'uploads');
 export class NegocioProveedorService {
   constructor(@InjectRepository(Negocio) private repo: Repository<Negocio>) {}
 
-  private async mio(userId: number) {
-    const negocio = await this.repo.findOne({ where: { owner: { id: userId } }, order: { creadoEn: 'ASC' } });
+  private async mio(userId: number, privados = false) {
+    const q = this.repo.createQueryBuilder('n').leftJoin('n.owner', 'o').where('o.id = :userId', { userId }).orderBy('n.creadoEn', 'ASC');
+    if (privados) q.addSelect(['n.instruccionesPago', 'n.visitasPorDia']);
+    const negocio = await q.getOne();
     if (!negocio) throw new ForbiddenException('Tu cuenta no tiene un negocio');
     return negocio;
   }
 
-  obtener(userId: number) {
-    return this.mio(userId);
+  async obtener(userId: number) {
+    const n = await this.mio(userId, true);
+    return this.salida(n);
+  }
+
+  // Quita el historial de visitas del perfil (se consulta en /estadisticas)
+  private salida(n: Negocio) {
+    const { visitasPorDia, ...resto } = n;
+    void visitasPorDia;
+    return resto;
+  }
+
+  // Visitas al perfil: últimos 14 días y comparación con los 7 anteriores
+  async estadisticas(userId: number) {
+    const n = await this.mio(userId, true);
+    const dias = n.visitasPorDia ?? {};
+    const serie: { fecha: string; total: number }[] = [];
+    const hoy = new Date(`${ahoraLocal().fecha}T12:00:00Z`);
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(hoy);
+      d.setUTCDate(d.getUTCDate() - i);
+      const f = d.toISOString().slice(0, 10);
+      serie.push({ fecha: f, total: dias[f] ?? 0 });
+    }
+    const suma = (l: { total: number }[]) => l.reduce((a, x) => a + x.total, 0);
+    return { serie, visitas7: suma(serie.slice(7)), visitasPrevias7: suma(serie.slice(0, 7)) };
   }
 
   async actualizar(userId: number, dto: ActualizarPerfilDto) {
@@ -34,12 +61,20 @@ export class NegocioProveedorService {
       throw new BadRequestException('Esa subcategoría no pertenece a la categoría elegida');
     }
     Object.assign(negocio, dto, { subcategoria });
-    if (dto.ciudad !== undefined || dto.colonia !== undefined) {
-      negocio.direccion = [negocio.colonia, negocio.ciudad].filter(Boolean).join(', ') || negocio.direccion;
+    if (dto.ciudad !== undefined || dto.colonia !== undefined || dto.calle !== undefined) {
+      negocio.direccion = [negocio.calle, negocio.colonia, negocio.ciudad].filter(Boolean).join(', ') || negocio.direccion;
+    }
+    if (dto.calle === '') negocio.calle = null;
+    if (dto.referencias === '') negocio.referencias = null;
+    if (dto.instruccionesPago === '') negocio.instruccionesPago = null;
+    if (dto.atiendeDomicilio === false) {
+      // Sin domicilio, los servicios a domicilio pasan a ser solo en el negocio
+      await this.repo.manager.query("UPDATE servicios SET modalidad = 'local', costoTraslado = NULL WHERE negocioId = ? AND modalidad != 'local'", [negocio.id]);
     }
     // Vacío = sin valor
     if (dto.whatsapp === '') negocio.whatsapp = null;
-    return this.repo.save(negocio);
+    await this.repo.save(negocio);
+    return this.obtener(userId);
   }
 
   // Lo mínimo para salir en el directorio

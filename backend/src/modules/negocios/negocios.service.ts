@@ -1,3 +1,4 @@
+import { ahoraLocal } from '../agenda/disponibilidad';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -92,7 +93,9 @@ export class NegociosService implements OnModuleInit {
   // Uso público: solo expone id y nombre del dueño (nunca el hash ni el correo)
   async uno(id: number) {
     const negocio = await this.cargar(id);
-    return { ...negocio, owner: negocio.owner ? { id: negocio.owner.id, nombre: negocio.owner.nombre } : null };
+    // Las instrucciones de pago solo salen si el negocio decidió mostrarlas
+    const extra = negocio.mostrarPagoPerfil ? await this.repo.createQueryBuilder('n').addSelect('n.instruccionesPago').where('n.id = :id', { id }).getOne() : null;
+    return { ...negocio, instruccionesPago: extra?.instruccionesPago ?? null, owner: negocio.owner ? { id: negocio.owner.id, nombre: negocio.owner.nombre } : null };
   }
 
   async crear(dto: CrearNegocioDto, owner?: Usuario) {
@@ -166,6 +169,19 @@ export class NegociosService implements OnModuleInit {
     const negocio = await this.cargar(id);
     negocio.clicsWhatsapp += 1;
     return await this.repo.save(negocio);
+  }
+
+  async registrarVisita(id: number) {
+    const negocio = await this.repo.createQueryBuilder('n').addSelect('n.visitasPorDia').where('n.id = :id', { id }).getOne();
+    if (!negocio || negocio.estado !== 'publicado') throw new NotFoundException('Negocio no encontrado');
+    const hoy = ahoraLocal().fecha;
+    const dias = { ...(negocio.visitasPorDia ?? {}) };
+    dias[hoy] = (dias[hoy] ?? 0) + 1;
+    // Solo se guardan 30 días
+    for (const f of Object.keys(dias).sort().slice(0, -30)) delete dias[f];
+    negocio.visitasPorDia = dias;
+    await this.repo.save(negocio);
+    return { ok: true };
   }
 
   async registrarClicLlamada(id: number) {

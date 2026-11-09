@@ -39,6 +39,12 @@ export type Negocio = {
   imagenUrl: string | null;
   galeria: string[] | null;
   metodosPago?: string[] | null;
+  calle?: string | null;
+  referencias?: string | null;
+  atiendeDomicilio?: boolean;
+  mostrarPagoPerfil?: boolean;
+  // Solo para el dueño, o público si mostrarPagoPerfil
+  instruccionesPago?: string | null;
   cobertura?: { radioKm: number; zonas: string[] } | null;
   clicsWhatsapp: number;
   clicsLlamada: number;
@@ -88,7 +94,11 @@ export type Cuenta = {
 };
 
 // Servicios, citas y mensajes
-export type Servicio = { id: number; nombre: string; descripcion: string | null; precio: number | null; duracionMin: number; activo: boolean };
+export type Modalidad = 'local' | 'domicilio' | 'ambos';
+export type Servicio = {
+  id: number; nombre: string; descripcion: string | null; precio: number | null; duracionMin: number; activo: boolean;
+  categoria: string | null; modalidad: Modalidad; costoTraslado: number | null; indicaciones: string | null; fotoUrl: string | null;
+};
 
 export type EstadoCita = 'solicitada' | 'confirmada' | 'propuesta' | 'rechazada' | 'cancelada';
 export type Cita = {

@@ -142,6 +142,8 @@ erDiagram
   }
 ```
 
+`negocios` también guarda `calle`, `referencias`, `atiendeDomicilio`, `instruccionesPago` (privado), `mostrarPagoPerfil` y `visitasPorDia` (json privado, 30 días; en PostgreSQL conviene una tabla `visitas(negocioId, fecha, total)`). `servicios` suma `categoria`, `modalidad`, `costoTraslado`, `indicaciones` y `fotoUrl`.
+
 `negocios.disponibilidad` (json: duracionBase, intervaloMin, anticipacionHoras, maxDias) y `negocios.bloqueos` (json: lista de {desde, hasta, motivo}) junto con `horariosJson` definen las horas reservables. En PostgreSQL pueden ser `jsonb` o tablas aparte. `notificaciones` pertenece a un usuario (cliente o negocio).
 
 `interesados` guarda los contactos del formulario "Únete gratis" de la landing (sin cuenta, sin relaciones).

@@ -29,6 +29,11 @@ export class NegocioProveedorController {
     return this.service.obtener(req.user.sub);
   }
 
+  @Get('estadisticas')
+  estadisticas(@Req() req: Req_) {
+    return this.service.estadisticas(req.user.sub);
+  }
+
   @Put()
   actualizar(@Req() req: Req_, @Body() dto: ActualizarPerfilDto) {
     return this.service.actualizar(req.user.sub, dto);

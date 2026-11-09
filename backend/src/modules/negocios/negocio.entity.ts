@@ -90,6 +90,28 @@ export class Negocio {
   metodosPago: string[] | null;
 
   // Dónde atiende: radio en km y zonas/colonias extra
+  // Dirección completa y cómo llegar
+  @Column({ type: 'varchar', nullable: true })
+  calle: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  referencias: string | null;
+
+  // Si el negocio sale a atender al domicilio del cliente
+  @Column({ type: 'boolean', default: false })
+  atiendeDomicilio: boolean;
+
+  // Datos para pagar (CLABE, titular...). Privado: solo se muestra si mostrarPagoPerfil
+  @Column({ type: 'text', nullable: true, select: false })
+  instruccionesPago: string | null;
+
+  @Column({ type: 'boolean', default: true })
+  mostrarPagoPerfil: boolean;
+
+  // Visitas al perfil por día { 'AAAA-MM-DD': n }, últimos 30 días. Privado
+  @Column({ type: 'json', nullable: true, select: false })
+  visitasPorDia: Record<string, number> | null;
+
   @Column({ type: 'json', nullable: true })
   cobertura: { radioKm: number; zonas: string[] } | null;
 

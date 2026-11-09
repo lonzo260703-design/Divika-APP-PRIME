@@ -87,14 +87,15 @@ Estados de una cita: `solicitada → confirmada | rechazada`, `solicitada → pr
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET | `/negocios/:id/servicios` | Servicios activos del negocio: `{ id, nombre, descripcion, precio (nulo = a consultar), duracionMin, activo }` |
+| GET | `/negocios/:id/servicios` | Servicios activos del negocio: `{ id, nombre, descripcion, precio (nulo = a consultar), duracionMin, activo, categoria, modalidad (local\|domicilio\|ambos), costoTraslado, indicaciones, fotoUrl }` |
 | GET | `/negocios/:id/disponibilidad?fecha=AAAA-MM-DD&servicioId=` | Oferta calculada por el servidor: `{ fecha, abierto, motivo?, duracionMin, horas: [{ hora, libre }], ocupadas: ["10:00"] }`. Aplica horario semanal, bloqueos, anticipación mínima, días máximos y traslape con citas confirmadas (según duración del servicio). 404 si el negocio no está publicado |
 | POST 🔒 | `/citas` | Cliente: `{ negocioId, servicioId?, fecha, hora, personas, notas?, metodoPago? }`. 400 si la hora está fuera de la oferta (cerrado, bloqueado, anticipación); 409 si el horario está ocupado o ya pidió ese horario |
 | GET 🔒 | `/citas/mias` | Citas del cliente |
 | POST 🔒 | `/citas/:id/aceptar-propuesta` | El cliente acepta el horario que propuso el negocio |
 | POST 🔒 | `/citas/:id/cancelar` | Cancela el cliente dueño de la cita o el dueño del negocio |
 | GET / POST 🔒 | `/mensajes`, `/mensajes/negocio/:negocioId` | Cliente: conversaciones; hilo (marca leídos); envío `{ texto }` (POST) |
-| GET / POST / PUT / DELETE 🔒 | `/proveedor/servicios[/:id]` | CRUD de servicios del negocio `{ nombre, descripcion?, precio?, duracionMin, activo? }` |
+| GET / POST / PUT / DELETE 🔒 | `/proveedor/servicios[/:id]` | CRUD de servicios del negocio `{ nombre, descripcion?, precio?, duracionMin, activo?, categoria?, modalidad? (por defecto local), costoTraslado?, indicaciones? }`. 400 si `modalidad` ≠ local y el negocio no tiene `atiendeDomicilio`. Con modalidad local el traslado se ignora |
+| POST / DELETE 🔒 | `/proveedor/servicios/:id/foto` | POST multipart con el campo `foto` (JPG/PNG, máx. 10 MB); DELETE la quita. Devuelve el servicio |
 | GET 🔒 | `/proveedor/citas` | Citas del negocio |
 | POST 🔒 | `/proveedor/citas/:id/confirmar`, `/rechazar` | Solo si está `solicitada` |
 | POST 🔒 | `/proveedor/citas/:id/proponer` | `{ fecha, hora }` → estado `propuesta` |
@@ -102,6 +103,14 @@ Estados de una cita: `solicitada → confirmada | rechazada`, `solicitada → pr
 | GET / PUT 🔒 | `/proveedor/disponibilidad` | `{ horarios: { domingo…sabado: { apertura, cierre, cerrado } }, reglas: { duracionBase, intervaloMin (15/30/60), anticipacionHoras, maxDias }, bloqueos: [{ desde, hasta, motivo? }] }`. PUT acepta cualquier parte; 400 si cierre ≤ apertura, intervalo inválido o bloqueo con `hasta` < `desde`. Zona horaria: variable `TZ_NEGOCIOS` (por defecto America/Mexico_City) |
 | GET 🔒 | `/proveedor/resenas` | Reseñas del negocio |
 | POST 🔒 | `/proveedor/resenas/:id/respuesta` | `{ texto }` (máx. 500). Aparece como `respuesta` en `GET /resenas/negocio/:id` |
+
+## Ubicación, pagos y visitas del negocio 🔒
+`PUT /proveedor/negocio` acepta además: `calle`, `colonia`, `ciudad` (la `direccion` pública se arma con calle, colonia y ciudad), `referencias`, `latitud`, `longitud`, `atiendeDomicilio` (al apagarlo, los servicios a domicilio pasan a `local`), `instruccionesPago` (máx. 500), `mostrarPagoPerfil`. `GET/PUT /proveedor/negocio` devuelven `instruccionesPago` solo al dueño; `GET /negocios/:id` la incluye únicamente si `mostrarPagoPerfil` es verdadero y los listados nunca la incluyen.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/negocios/:id/visita` | Suma una visita al perfil (el front lo llama al abrir el detalle). 404 si no está publicado |
+| GET 🔒 | `/proveedor/negocio/estadisticas` | `{ serie: [{ fecha, total }] (14 días), visitas7, visitasPrevias7 }` |
 
 ## Notificaciones 🔒 (cualquier rol)
 Avisos dentro de la app. Se crean al: llegar/confirmar/rechazar/proponer/aceptar/cancelar una cita, recibir un mensaje (en ambos sentidos), recibir una reseña y al responder el negocio una reseña.

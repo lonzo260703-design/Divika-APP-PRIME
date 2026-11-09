@@ -27,6 +27,7 @@ export default function NegocioPage() {
 
   useEffect(() => {
     api<NegocioDetalle>(`/negocios/${id}`).then(setNegocio).catch((e: Error) => setError(e.message));
+    api(`/negocios/${id}/visita`, { method: 'POST' }).catch(() => {});
     api<Servicio[]>(`/negocios/${id}/servicios`).then(setServicios).catch(() => setServicios([]));
     api<Resena[]>(`/resenas/negocio/${id}`).then(setResenas).catch(() => setResenas([]));
   }, [id]);
@@ -140,15 +141,26 @@ export default function NegocioPage() {
             <h2>Servicios</h2>
             {servicios.map((s) => (
               <div key={s.id} className="servicio-fila">
-                <span><strong>{s.nombre}</strong><small>{s.duracionMin} min{s.descripcion ? ` · ${s.descripcion}` : ''}</small></span>
+                {s.fotoUrl && <img src={s.fotoUrl} alt="" className="servicio-foto servicio-foto--chica" />}
+                <span><strong>{s.nombre}</strong><small>{[s.categoria, `${s.duracionMin} min`, s.modalidad === 'domicilio' ? 'A domicilio' : s.modalidad === 'ambos' ? 'En el negocio o a domicilio' : null, s.modalidad !== 'local' && s.costoTraslado ? `traslado ${pesos(s.costoTraslado)}` : null, s.descripcion].filter(Boolean).join(' · ')}</small>{s.indicaciones && <small>{s.indicaciones}</small>}</span>
                 <strong>{pesos(s.precio)}</strong>
               </div>
             ))}
           </section>
         )}
 
+        {!!negocio.metodosPago?.length && (
+          <section className="bloque">
+            <h2>Formas de pago</h2>
+            <p>{negocio.metodosPago.map((m) => ({ efectivo: 'Efectivo', transferencia: 'Transferencia', tarjeta: 'Tarjeta' }[m] ?? m)).join(' · ')}</p>
+            {negocio.instruccionesPago && <p className="pantalla-nota">{negocio.instruccionesPago}</p>}
+            <p className="pantalla-nota">El pago se arregla directamente con el negocio; Divika no procesa pagos.</p>
+          </section>
+        )}
+
         <section className="bloque">
           <h2>Ubicación</h2>
+          {negocio.referencias && <p className="pantalla-nota">{negocio.referencias}</p>}
           <iframe className="mapa" title={`Mapa de ${negocio.nombre}`} src={mapa} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           <p className="detalle__linea"><IconPin /> {negocio.direccion}</p>
         </section>

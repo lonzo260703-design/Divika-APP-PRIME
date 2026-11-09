@@ -23,6 +23,8 @@ export default function ReservarPage() {
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
   const [servicioId, setServicioId] = useState<number | null>(null);
+  const [lugar, setLugar] = useState<'local' | 'domicilio'>('local');
+  const [direccion, setDireccion] = useState('');
   const [personas, setPersonas] = useState(1);
   const [notas, setNotas] = useState('');
   const [metodo, setMetodo] = useState('');
@@ -47,12 +49,14 @@ export default function ReservarPage() {
   const horas = oferta?.horas ?? [];
   const servicio = servicios.find((s) => s.id === servicioId) ?? null;
   const pagos = negocio.metodosPago ?? [];
+  const aDomicilio = !!servicio && (servicio.modalidad === 'domicilio' || (servicio.modalidad === 'ambos' && lugar === 'domicilio'));
+  const notasFinal = [aDomicilio ? `Servicio a domicilio. Dirección: ${direccion.trim()}` : '', notas].filter(Boolean).join('\n');
 
   async function confirmar() {
     setError('');
     setEnviando(true);
     try {
-      setCita(await api<Cita>('/citas', { method: 'POST', body: { negocioId: negocio!.id, servicioId: servicioId ?? undefined, fecha, hora, personas, notas: notas || undefined, metodoPago: metodo || undefined } }));
+      setCita(await api<Cita>('/citas', { method: 'POST', body: { negocioId: negocio!.id, servicioId: servicioId ?? undefined, fecha, hora, personas, notas: notasFinal || undefined, metodoPago: metodo || undefined } }));
       setPaso(4);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo enviar la solicitud');
@@ -109,11 +113,23 @@ export default function ReservarPage() {
               <div className="opciones-radio" role="radiogroup">
                 {servicios.map((s) => (
                   <button key={s.id} type="button" role="radio" aria-checked={servicioId === s.id} className={cx('opcion-radio', servicioId === s.id && 'opcion-radio--activa')} onClick={() => setServicioId(s.id)}>
-                    <span><strong>{s.nombre}</strong><small>{pesos(s.precio)} · {s.duracionMin} min</small></span><span className="opcion-radio__punto" />
+                    <span><strong>{s.nombre}</strong><small>{pesos(s.precio)} · {s.duracionMin} min{s.modalidad === 'domicilio' ? ' · a domicilio' : s.modalidad === 'ambos' ? ' · negocio o domicilio' : ''}{s.modalidad !== 'local' && s.costoTraslado ? ` · traslado ${pesos(s.costoTraslado)}` : ''}</small>{s.indicaciones && <small>{s.indicaciones}</small>}</span><span className="opcion-radio__punto" />
                   </button>
                 ))}
               </div>
             </>
+          )}
+          {servicio?.modalidad === 'ambos' && (
+            <div className="opciones-radio" role="radiogroup" aria-label="Dónde quieres el servicio">
+              {([['local', 'En el negocio'], ['domicilio', 'En mi domicilio']] as const).map(([v, t]) => (
+                <button key={v} type="button" role="radio" aria-checked={lugar === v} className={cx('opcion-radio', lugar === v && 'opcion-radio--activa')} onClick={() => setLugar(v)}><span><strong>{t}</strong></span><span className="opcion-radio__punto" /></button>
+              ))}
+            </div>
+          )}
+          {aDomicilio && (
+            <label className="campo-etiqueta">Tu dirección *
+              <input value={direccion} maxLength={200} placeholder="Calle, número y colonia" onChange={(e) => setDireccion(e.target.value)} />
+            </label>
           )}
           <h2 className="seccion-titulo">¿Cuántas personas?</h2>
           <div className="contador">
@@ -124,7 +140,7 @@ export default function ReservarPage() {
           <label className="campo-etiqueta">Notas para el negocio (opcional)
             <textarea value={notas} maxLength={300} onChange={(e) => setNotas(e.target.value)} placeholder="Alergias, ocasión especial…" />
           </label>
-          <Button className="btn--block" disabled={servicios.length > 0 && !servicioId} onClick={() => setPaso(2)}>Continuar</Button>
+          <Button className="btn--block" disabled={(servicios.length > 0 && !servicioId) || (aDomicilio && !direccion.trim())} onClick={() => setPaso(2)}>Continuar</Button>
         </>
       )}
 
@@ -134,6 +150,8 @@ export default function ReservarPage() {
           <div className="grupo">
             <Fila t="Negocio" v={negocio.nombre} />
             {servicio && <Fila t="Servicio" v={`${servicio.nombre} · ${pesos(servicio.precio)}`} />}
+            {aDomicilio && <Fila t="Lugar" v={`A domicilio · ${direccion.trim()}`} />}
+            {aDomicilio && !!servicio?.costoTraslado && <Fila t="Traslado" v={`${pesos(servicio.costoTraslado)} (se paga al negocio)`} />}
             <Fila t="Fecha" v={fechaLarga(fecha)} />
             <Fila t="Hora" v={`${hora} h`} />
             <Fila t="Personas" v={String(personas)} />

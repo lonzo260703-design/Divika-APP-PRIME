@@ -13,11 +13,13 @@ export default function PortalInicio() {
   const [resenas, setResenas] = useState<Resena[]>([]);
   const [servicios, setServicios] = useState<Servicio[]>([]);
   const [convs, setConvs] = useState<Conversacion[]>([]);
+  const [vis, setVis] = useState<{ serie: { fecha: string; total: number }[]; visitas7: number; visitasPrevias7: number } | null>(null);
   useEffect(() => {
     api<Cita[]>('/proveedor/citas').then(setCitas).catch(() => {});
     api<Resena[]>('/proveedor/resenas').then(setResenas).catch(() => {});
     api<Servicio[]>('/proveedor/servicios').then(setServicios).catch(() => {});
     api<Conversacion[]>('/proveedor/mensajes').then(setConvs).catch(() => {});
+    api<NonNullable<typeof vis>>('/proveedor/negocio/estadisticas').then(setVis).catch(() => {});
   }, []);
 
   const hoy = iso(new Date());
@@ -30,7 +32,7 @@ export default function PortalInicio() {
     ['Fotos y datos del perfil', !!negocio.galeria?.length && !!negocio.descripcion, '/portal/perfil'],
     ['Al menos un servicio', servicios.length > 0, '/portal/servicios'],
     ['Formas de pago', !!negocio.metodosPago?.length, '/portal/pagos'],
-    ['Ubicación y cobertura', !!negocio.cobertura, '/portal/cobertura'],
+    ['Ubicación y cobertura', !!negocio.cobertura && !!negocio.calle, '/portal/cobertura'],
     ['Perfil publicado', negocio.estado === 'publicado', '/portal/perfil'],
   ];
   const hechos = pasos.filter(([, ok]) => ok).length;
@@ -57,6 +59,7 @@ export default function PortalInicio() {
       <div className="stats stats--4">
         <Link href="/portal/solicitudes" className="stat"><strong>{pendientes.length}</strong><small>Solicitudes por responder</small></Link>
         <Link href="/portal/calendario" className="stat"><strong>{proximas.length}</strong><small>Citas confirmadas próximas</small></Link>
+        <div className="stat"><strong>{vis?.visitas7 ?? '—'}</strong><small>Visitas al perfil (7 días){vis && vis.visitasPrevias7 > 0 ? ` · ${vis.visitas7 >= vis.visitasPrevias7 ? '▲' : '▼'} ${Math.abs(Math.round(((vis.visitas7 - vis.visitasPrevias7) / vis.visitasPrevias7) * 100))}%` : ''}</small></div>
         <div className="stat"><strong>{contactos}</strong><small>Contactos (WhatsApp y llamadas)</small></div>
         <Link href="/portal/resenas" className="stat"><strong>{resenas.length ? negocio.calificacion.toFixed(1) : '—'}</strong><small>{resenas.length} reseña{resenas.length === 1 ? '' : 's'}</small></Link>
       </div>
@@ -88,6 +91,14 @@ export default function PortalInicio() {
         </div>
 
         <div className="p-col">
+          {vis && (
+            <section className="p-tarjeta">
+              <div className="p-fila-cab"><h2>Visitas a tu perfil</h2><small>Últimos 14 días</small></div>
+              <div className="p-barras" role="img" aria-label={`Visitas por día: ${vis.serie.map((d) => d.total).join(', ')}`}>
+                {vis.serie.map((d) => <span key={d.fecha} title={`${d.fecha}: ${d.total}`} style={{ height: `${Math.max(4, (d.total / Math.max(1, ...vis.serie.map((x) => x.total))) * 100)}%` }} />)}
+              </div>
+            </section>
+          )}
           <section className="p-tarjeta">
             <div className="p-fila-cab"><h2>Completa la configuración</h2><strong>{pct}%</strong></div>
             <div className="p-medidor"><span style={{ width: `${pct}%` }} /></div>

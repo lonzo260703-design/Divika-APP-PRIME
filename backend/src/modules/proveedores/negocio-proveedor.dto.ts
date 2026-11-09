@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsNumber, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateNested } from 'class-validator';
 import { CATEGORIAS } from '../negocios/categorias';
 
 export const METODOS_PAGO = ['efectivo', 'transferencia', 'tarjeta'];
@@ -67,6 +67,39 @@ export class ActualizarPerfilDto {
   @ValidateNested()
   @Type(() => CoberturaDto)
   cobertura?: CoberturaDto;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(160, { message: 'La calle y número pueden tener máximo 160 caracteres' })
+  calle?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300, { message: 'Las referencias pueden tener máximo 300 caracteres' })
+  referencias?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  atiendeDomicilio?: boolean;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'Latitud no válida' })
+  @Min(-90) @Max(90)
+  latitud?: number;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'Longitud no válida' })
+  @Min(-180) @Max(180)
+  longitud?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500, { message: 'Las instrucciones de pago pueden tener máximo 500 caracteres' })
+  instruccionesPago?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  mostrarPagoPerfil?: boolean;
 }
 
 export class OrdenFotosDto {
