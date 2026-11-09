@@ -1,5 +1,21 @@
-import { IsArray, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayMaxSize, IsArray, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, Max, MaxLength, Min, ValidateNested } from 'class-validator';
 import { CATEGORIAS } from '../negocios/categorias';
+
+export const METODOS_PAGO = ['efectivo', 'transferencia', 'tarjeta'];
+
+export class CoberturaDto {
+  @IsInt({ message: 'El radio debe ser un número entero de km' })
+  @Min(1, { message: 'El radio mínimo es 1 km' })
+  @Max(100, { message: 'El radio máximo es 100 km' })
+  radioKm: number;
+
+  @IsArray()
+  @ArrayMaxSize(15, { message: 'Máximo 15 zonas' })
+  @IsString({ each: true })
+  @MaxLength(60, { each: true, message: 'Cada zona puede tener máximo 60 caracteres' })
+  zonas: string[];
+}
 
 // Lo que el proveedor puede editar en "Perfil del negocio"
 export class ActualizarPerfilDto {
@@ -41,6 +57,16 @@ export class ActualizarPerfilDto {
   @IsOptional()
   @IsString()
   colonia?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsIn(METODOS_PAGO, { each: true, message: 'Método de pago no válido' })
+  metodosPago?: string[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CoberturaDto)
+  cobertura?: CoberturaDto;
 }
 
 export class OrdenFotosDto {

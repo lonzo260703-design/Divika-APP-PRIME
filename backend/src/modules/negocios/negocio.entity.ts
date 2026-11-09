@@ -77,6 +77,14 @@ export class Negocio {
   @Column({ type: 'json', nullable: true })
   galeria: string[] | null;
 
+  // Formas de pago que acepta el negocio (solo informativo: Divika no procesa pagos)
+  @Column({ type: 'json', nullable: true })
+  metodosPago: string[] | null;
+
+  // Dónde atiende: radio en km y zonas/colonias extra
+  @Column({ type: 'json', nullable: true })
+  cobertura: { radioKm: number; zonas: string[] } | null;
+
   @ManyToOne(() => Usuario, { nullable: true, onDelete: 'SET NULL' })
   owner: Usuario | null;
 
