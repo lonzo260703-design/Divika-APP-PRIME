@@ -290,3 +290,15 @@
   .p-contenido { padding: var(--espacio-5); }
   .p-lateral { position: sticky; top: 0; height: 100vh; }
 }
+
+/* ---------- Portal: páginas de ajustes y app móvil del proveedor ---------- */
+.p-estrecho { display: flex; flex-direction: column; gap: var(--espacio-3); max-width: 560px; }
+.p-estrecho .grupo { box-shadow: none; border: 1px solid var(--portal-borde); }
+.cuenta-cab { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--espacio-3) 0; text-align: center; color: var(--color-primario); }
+.cuenta-cab small { font-size: 11px; color: #666; }
+.p-nav-inferior { display: none; }
+.p-movil .p-lateral, .p-movil .p-hamburguesa, .p-movil .p-barra-sup__enlace, .p-movil .p-cuenta { display: none !important; }
+.p-movil .p-nav-inferior { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--portal-borde); }
+.p-nav-inferior a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; border-radius: 10px; font-size: 10px; font-weight: 600; color: #6b6f8d; text-decoration: none; }
+.p-nav-inferior a[aria-current=page] { color: var(--portal-morado); background: #f0effa; }
+.p-movil .p-contenido { padding-bottom: 84px; }

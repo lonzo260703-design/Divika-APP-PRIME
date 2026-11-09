@@ -10,6 +10,8 @@ import { IconCheck, IconScissors, IconShield, IconStore, IconUser } from '@/comp
 import { api } from '@/lib/api';
 import { cerrarSesion, entrar, getUsuario } from '@/lib/auth';
 import { useCategorias } from '@/lib/categorias';
+import { useEscritorio } from '@/lib/useEscritorio';
+import { RegistroProveedorMovil } from '@/components/portal/RegistroProveedorMovil';
 import { cx } from '@/lib/cx';
 import type { Negocio } from '@/types';
 
@@ -28,7 +30,7 @@ const TITULOS = [
 ];
 
 // Registro de proveedor en 4 pasos (diseño web "Crea tu cuenta de proveedor")
-export default function RegistroProveedor() {
+function RegistroProveedorWeb() {
   const router = useRouter();
   const { categorias } = useCategorias();
   const [paso, setPaso] = useState(0);
@@ -280,4 +282,10 @@ function PasoPublicar({ negocio, onAtras, onPublicar, onDespues }: { negocio: Ne
       <Lateral nombre={negocio.nombre} />
     </div>
   );
+}
+
+export default function RegistroProveedor() {
+  const escritorio = useEscritorio();
+  if (escritorio === null) return null;
+  return escritorio ? <RegistroProveedorWeb /> : <RegistroProveedorMovil />;
 }

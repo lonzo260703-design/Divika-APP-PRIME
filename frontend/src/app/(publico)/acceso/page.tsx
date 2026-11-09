@@ -94,6 +94,8 @@ export default function AccesoPage() {
 
       <p className="texto-aparte pie">
         <Link href="/login">Entrar con contraseña</Link>
+        {' · '}
+        <Link href="/login/proveedores">Soy proveedor</Link>
       </p>
     </main>
   );

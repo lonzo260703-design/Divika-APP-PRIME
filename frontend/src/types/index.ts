@@ -38,6 +38,8 @@ export type Negocio = {
   calificacion: number;
   imagenUrl: string | null;
   galeria: string[] | null;
+  metodosPago?: string[] | null;
+  cobertura?: { radioKm: number; zonas: string[] } | null;
   clicsWhatsapp: number;
   clicsLlamada: number;
   creadoEn: string;
