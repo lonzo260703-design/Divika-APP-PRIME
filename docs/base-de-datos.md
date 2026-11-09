@@ -9,6 +9,12 @@ erDiagram
   negocios ||--o{ resenas : recibe
   usuarios ||--o{ favoritos : marca
   usuarios ||--o{ reportes_problema : envia
+  negocios ||--o{ servicios : ofrece
+  negocios ||--o{ citas : recibe
+  usuarios ||--o{ citas : solicita
+  servicios ||--o{ citas : "se reserva en"
+  negocios ||--o{ mensajes : conversa
+  usuarios ||--o{ mensajes : escribe
   negocios ||--o{ favoritos : "es marcado"
 
   usuarios {
@@ -29,6 +35,39 @@ erDiagram
     date otpExpiraEn
     string googleId UK
     string appleId UK
+    date creadoEn
+  }
+  servicios {
+    int id PK
+    string nombre
+    string descripcion
+    float precio "nulo = a consultar"
+    int duracionMin
+    bool activo
+    int negocioId FK
+  }
+  citas {
+    int id PK
+    int negocioId FK
+    int clienteId FK
+    int servicioId FK
+    string fecha "AAAA-MM-DD"
+    string hora "HH:MM"
+    int personas
+    string notas
+    string metodoPago "informativo"
+    string estado "solicitada | confirmada | propuesta | rechazada | cancelada"
+    string propuestaFecha
+    string propuestaHora
+    date creadoEn
+  }
+  mensajes {
+    int id PK
+    int negocioId FK
+    int clienteId FK
+    string de "cliente | negocio"
+    string texto
+    bool leido
     date creadoEn
   }
   reportes_problema {
@@ -71,6 +110,8 @@ erDiagram
     int id PK
     int calificacion "1 a 5"
     text comentario
+    text respuesta "del negocio"
+    date respuestaEn
     int usuarioId FK
     int negocioId FK
     date creadoEn

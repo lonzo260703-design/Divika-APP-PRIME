@@ -82,6 +82,28 @@ Pantallas de Perfil (editar, seguridad, notificaciones, privacidad, reportar pro
 
 Sin backend todavía (el front las muestra como "próximamente" o demo): verificación en dos pasos, dispositivos conectados, adjuntar imagen en reportes, formas de pago (demo, sin datos reales de tarjeta).
 
+## Servicios, citas y mensajes
+Estados de una cita: `solicitada → confirmada | rechazada`, `solicitada → propuesta → confirmada` (el cliente acepta), y `cancelada` (cliente o negocio). Un horario solo se bloquea cuando hay una cita **confirmada**. Las fechas son `AAAA-MM-DD` y las horas `HH:MM`.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/negocios/:id/servicios` | Servicios activos del negocio: `{ id, nombre, descripcion, precio (nulo = a consultar), duracionMin, activo }` |
+| GET | `/negocios/:id/disponibilidad?fecha=AAAA-MM-DD` | `{ fecha, ocupadas: ["10:00"] }` horas ya confirmadas |
+| POST 🔒 | `/citas` | Cliente: `{ negocioId, servicioId?, fecha, hora, personas, notas?, metodoPago? }`. 409 si el horario está ocupado o ya pidió ese horario |
+| GET 🔒 | `/citas/mias` | Citas del cliente |
+| POST 🔒 | `/citas/:id/aceptar-propuesta` | El cliente acepta el horario que propuso el negocio |
+| POST 🔒 | `/citas/:id/cancelar` | Cancela el cliente dueño de la cita o el dueño del negocio |
+| GET / POST 🔒 | `/mensajes`, `/mensajes/negocio/:negocioId` | Cliente: conversaciones; hilo (marca leídos); envío `{ texto }` (POST) |
+| GET / POST / PUT / DELETE 🔒 | `/proveedor/servicios[/:id]` | CRUD de servicios del negocio `{ nombre, descripcion?, precio?, duracionMin, activo? }` |
+| GET 🔒 | `/proveedor/citas` | Citas del negocio |
+| POST 🔒 | `/proveedor/citas/:id/confirmar`, `/rechazar` | Solo si está `solicitada` |
+| POST 🔒 | `/proveedor/citas/:id/proponer` | `{ fecha, hora }` → estado `propuesta` |
+| GET / POST 🔒 | `/proveedor/mensajes`, `/proveedor/mensajes/:clienteId` | Conversaciones, hilo y respuesta. Solo se responde a clientes que escribieron o pidieron cita |
+| GET 🔒 | `/proveedor/resenas` | Reseñas del negocio |
+| POST 🔒 | `/proveedor/resenas/:id/respuesta` | `{ texto }` (máx. 500). Aparece como `respuesta` en `GET /resenas/negocio/:id` |
+
+Sin avisos automáticos todavía (no se envía SMS/correo/push cuando llega una cita o mensaje); el front consulta cada 8 s en los chats.
+
 ## Favoritos
 | Método | Ruta | Descripción |
 |---|---|---|
