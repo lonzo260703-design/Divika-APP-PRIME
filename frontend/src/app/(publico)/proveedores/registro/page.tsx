@@ -10,8 +10,6 @@ import { IconCheck, IconScissors, IconShield, IconStore, IconUser } from '@/comp
 import { api } from '@/lib/api';
 import { cerrarSesion, entrar, getUsuario } from '@/lib/auth';
 import { useCategorias } from '@/lib/categorias';
-import { useEscritorio } from '@/lib/useEscritorio';
-import { RegistroProveedorMovil } from '@/components/portal/RegistroProveedorMovil';
 import { cx } from '@/lib/cx';
 import type { Negocio } from '@/types';
 
@@ -285,7 +283,5 @@ function PasoPublicar({ negocio, onAtras, onPublicar, onDespues }: { negocio: Ne
 }
 
 export default function RegistroProveedor() {
-  const escritorio = useEscritorio();
-  if (escritorio === null) return null;
-  return escritorio ? <RegistroProveedorWeb /> : <RegistroProveedorMovil />;
+  return <RegistroProveedorWeb />;
 }

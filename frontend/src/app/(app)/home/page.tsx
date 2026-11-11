@@ -1,91 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { CategoryGrid } from '@/components/home/CategoryGrid';
-import { NegocioCard } from '@/components/negocio/NegocioCard';
 import { LandingContenido } from '@/components/web/LandingWeb';
 import { ListadoWeb } from '@/components/web/ListadoWeb';
-import { useEscritorio } from '@/lib/useEscritorio';
-import { PromoBanner } from '@/components/home/PromoBanner';
-import { TopTenItem } from '@/components/negocio/TopTenItem';
-import { IconPin } from '@/components/ui/icons';
-import { SearchBar } from '@/components/ui/SearchBar';
-import { api } from '@/lib/api';
-import { useCategorias } from '@/lib/categorias';
-import type { Negocio } from '@/types';
-
-function HomeMovil() {
-  const router = useRouter();
-  const { categorias } = useCategorias();
-  const [buscar, setBuscar] = useState('');
-  const [negocios, setNegocios] = useState<Negocio[]>([]);
-  const [top, setTop] = useState<Negocio[]>([]);
-  const [error, setError] = useState('');
-  const [cargado, setCargado] = useState(false);
-
-  // Si vienes del buscador del sitio web (/home?buscar=...), arranca con esa búsqueda
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get('buscar');
-    if (q) setBuscar(q);
-  }, []);
-
-  // Cada vez que cambia la búsqueda o la categoría, pide la lista al backend
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (buscar.trim()) params.set('buscar', buscar.trim());
-    const espera = setTimeout(() => {
-      api<Negocio[]>(`/negocios?${params}`)
-        .then((datos) => {
-          setNegocios(datos);
-          setError('');
-        })
-        .catch((e: Error) => setError(e.message))
-        .finally(() => setCargado(true));
-    }, 250); // espera 250 ms para no pedir en cada tecla
-    return () => clearTimeout(espera);
-  }, [buscar]);
-
-  useEffect(() => {
-    api<Negocio[]>('/negocios/top').then(setTop).catch(() => {});
-  }, []);
-
-  return (
-    <>
-      <SearchBar value={buscar} onChange={setBuscar} />
-      <PromoBanner />
-      <CategoryGrid categorias={categorias} onSelect={(slug) => router.push(`/categoria/${slug}`)} />
-
-      <section>
-        <h2 className="seccion--cerca"><IconPin /> Cerca de ti…</h2>
-        {error && <p className="form__error">{error}</p>}
-        {cargado && !error && negocios.length === 0 && <p className="texto-aparte">No encontramos negocios con esa búsqueda.</p>}
-        <div className="carrusel">
-          {negocios.map((n) => (
-            <NegocioCard key={n.id} negocio={n} onPress={() => router.push(`/negocio/${n.id}`)} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="seccion">Top 10</h2>
-        <div className="carrusel">
-          {top.map((n, i) => (
-            <TopTenItem key={n.id} imageUrl={n.imagenUrl ?? undefined} title={n.nombre} subtitle={n.categoria} position={i + 1} onPress={() => router.push(`/negocio/${n.id}`)} />
-          ))}
-        </div>
-      </section>
-    </>
-  );
-}
-
 
 export default function HomePage() {
-  const escritorio = useEscritorio();
   const [consulta, setConsulta] = useState<string | null>(null);
   useEffect(() => { setConsulta(new URLSearchParams(window.location.search).get('buscar') ?? ''); }, []);
-  if (escritorio === null || consulta === null) return null;
-  if (!escritorio) return <HomeMovil />;
-  // En escritorio, con búsqueda se muestran resultados; sin ella, el inicio web
+  if (consulta === null) return null;
+  // Con búsqueda se muestran resultados; sin ella, el inicio
   return consulta ? <ListadoWeb consulta={consulta} /> : <LandingContenido />;
 }

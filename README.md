@@ -2,6 +2,8 @@
 
 Directorio de negocios locales. Monorepo con backend NestJS y frontend Next.js.
 
+**Ramas:** `main` tiene solo el **sitio web**, que se adapta al tamaño de la ventana (computadora, tablet o ventana angosta). La versión anterior con diseño de app de celular quedó guardada en la rama `movil` (`git checkout movil` para verla).
+
 ```
 divika/
 ├── backend/    NestJS + TypeORM + SQLite   → http://localhost:3001

@@ -2,30 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { MarcoWeb } from '@/components/web/MarcoWeb';
 import { getToken } from '@/lib/auth';
-import { useEscritorio } from '@/lib/useEscritorio';
 
-// Protege TODAS las pantallas de este grupo: sin sesión te manda al inicio
+// Protege TODAS las pantallas de este grupo: sin sesión te manda a iniciar sesión
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [listo, setListo] = useState(false);
-  const escritorio = useEscritorio();
 
   useEffect(() => {
-    // Sin sesión: en celular al inicio; en escritorio a la pantalla de acceso (el inicio web es público)
-    if (!getToken()) router.replace(window.matchMedia('(min-width: 900px)').matches ? '/login' : '/');
+    if (!getToken()) router.replace('/login');
     else setListo(true);
   }, [router]);
 
-  if (!listo || escritorio === null) return null;
-  if (escritorio) return <MarcoWeb>{children}</MarcoWeb>;
-
-  return (
-    <>
-      <main className="screen">{children}</main>
-      <BottomNav />
-    </>
-  );
+  if (!listo) return null;
+  return <MarcoWeb>{children}</MarcoWeb>;
 }

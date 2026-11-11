@@ -6,8 +6,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { cx } from '@/lib/cx';
 import { cerrarSesion } from '@/lib/auth';
-import { useEscritorio } from '@/lib/useEscritorio';
-import { IconBell, IconCalendar, IconCard, IconChat, IconClipboard, IconExternal, IconGrid, IconMenu, IconPin, IconScissors, IconShield, IconStar, IconStore, IconUser } from '../ui/icons';
+import { IconBell, IconCalendar, IconCard, IconChat, IconClipboard, IconExternal, IconGrid, IconMenu, IconPin, IconScissors, IconShield, IconStar, IconStore } from '../ui/icons';
 import { ESTADO_TEXTO, iniciales, usePortal } from './PortalContext';
 
 export const SECCIONES = [
@@ -23,17 +22,6 @@ export const SECCIONES = [
   { slug: 'resenas', nombre: 'Reseñas', icono: <IconStar /> },
   { slug: 'seguridad', nombre: 'Seguridad', icono: <IconShield /> },
 ];
-
-// Barra inferior de la app móvil del proveedor
-const INFERIOR = [
-  { slug: 'solicitudes', nombre: 'Citas', icono: <IconClipboard /> },
-  { slug: 'calendario', nombre: 'Calendario', icono: <IconCalendar /> },
-  { slug: 'servicios', nombre: 'Servicios', icono: <IconScissors /> },
-  { slug: 'mensajes', nombre: 'Mensajes', icono: <IconChat /> },
-  { slug: 'cuenta', nombre: 'Perfil', icono: <IconUser /> },
-];
-// Pantallas que cuelgan de la pestaña Perfil
-const DE_PERFIL = ['cuenta', 'perfil', 'pagos', 'cobertura', 'notificaciones', 'seguridad', 'resenas'];
 
 function Ayuda() {
   return (
@@ -76,12 +64,11 @@ export function Estructura({ children }: { children: ReactNode }) {
     window.addEventListener('divika:avisos', cargar);
     return () => { clearInterval(id); window.removeEventListener('divika:avisos', cargar); };
   }, [ruta]);
-  const movil = useEscritorio() === false;
   const activo = (slug: string) => (slug ? ruta.startsWith(`/portal/${slug}`) : ruta === '/portal');
   const nombreCompleto = [usuario.nombre, usuario.apellidos].filter(Boolean).join(' ');
 
   return (
-    <div className={cx('portal', movil && 'p-movil')}>
+    <div className="portal">
       <aside className={cx('p-lateral', menu && 'p-lateral--abierto')}>
         <Link href="/" className="p-logo" aria-label="Divika, inicio"><img src="/logo.png" alt="Divika" /></Link>
         <TarjetaNegocio />
@@ -118,12 +105,6 @@ export function Estructura({ children }: { children: ReactNode }) {
         </header>
         <main className="p-contenido">{children}</main>
       </div>
-      <nav className="p-nav-inferior" aria-label="Menú principal">
-        {INFERIOR.map((s) => {
-          const act = s.slug === 'cuenta' ? DE_PERFIL.some((d) => ruta.startsWith(`/portal/${d}`)) : ruta.startsWith(`/portal/${s.slug}`);
-          return <Link key={s.slug} href={`/portal/${s.slug}`} aria-current={act ? 'page' : undefined}>{s.icono}{s.nombre}</Link>;
-        })}
-      </nav>
       {menu && <button type="button" className="p-velo" onClick={() => setMenu(false)} aria-label="Cerrar menú" />}
     </div>
   );

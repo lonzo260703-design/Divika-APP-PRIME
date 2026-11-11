@@ -1,15 +1,9 @@
 /* ============================================================
-   Versión web (escritorio). Las páginas con la clase .web-pagina
-   quitan el marco de teléfono cuando la pantalla mide 900px o más.
+   Sitio web. Se adapta al ancho de la ventana: base = pantalla angosta,
+   y a partir de 900px (y 1000px en las fichas) pasa a varias columnas.
    Colores y anchos: styles/tokens.css (--web-*).
    ============================================================ */
-.web-pagina { flex: 1; overflow-y: auto; display: flex; flex-direction: column; background: #fff; }
-
-@media (min-width: 900px) {
-  body:has(.web-pagina) { display: block; background: #fff; }
-  .frame:has(.web-pagina) { max-width: none; width: 100%; height: auto; min-height: 100vh; border: 0; border-radius: 0; overflow: visible; }
-  .web-pagina { overflow: visible; }
-}
+.web-pagina { flex: 1; display: flex; flex-direction: column; background: #fff; }
 
 /* ---------- Botones ---------- */
 .web-btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 20px; border: 0; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; }
@@ -291,17 +285,11 @@
   .p-lateral { position: sticky; top: 0; height: 100vh; }
 }
 
-/* ---------- Portal: páginas de ajustes y app móvil del proveedor ---------- */
+/* ---------- Portal: páginas de ajustes ---------- */
 .p-estrecho { display: flex; flex-direction: column; gap: var(--espacio-3); max-width: 560px; }
 .p-estrecho .grupo { box-shadow: none; border: 1px solid var(--portal-borde); }
 .cuenta-cab { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--espacio-3) 0; text-align: center; color: var(--color-primario); }
 .cuenta-cab small { font-size: 11px; color: #666; }
-.p-nav-inferior { display: none; }
-.p-movil .p-lateral, .p-movil .p-hamburguesa, .p-movil .p-barra-sup__enlace, .p-movil .p-cuenta { display: none !important; }
-.p-movil .p-nav-inferior { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--portal-borde); }
-.p-nav-inferior a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; border-radius: 10px; font-size: 10px; font-weight: 600; color: #6b6f8d; text-decoration: none; }
-.p-nav-inferior a[aria-current=page] { color: var(--portal-morado); background: #f0effa; }
-.p-movil .p-contenido { padding-bottom: 84px; }
 
 /* ---------- Portal web: tableros y listas (diseño de escritorio) ---------- */
 .p-cab-pagina { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--espacio-3); }
@@ -553,3 +541,52 @@
 .wa-pie strong { margin-right: 10px; color: var(--color-primario); }
 .wa-pie__links { display: flex; gap: var(--espacio-4); }
 .wa-pie a { color: #777; text-decoration: none; }
+
+
+/* ============================================================
+   Adaptación a ventanas medianas y pequeñas
+   ============================================================ */
+html { -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+.web-cab { padding-inline: var(--espacio-4); }
+.wa-contenido { min-width: 0; }
+
+@media (max-width: 1000px) {
+  .wa-ficha { grid-template-columns: 1fr; }
+  .wa-reserva { position: static; }
+  .wa-cuerpo { grid-template-columns: 1fr; }
+  .wa-filtros { position: static; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--espacio-4); }
+  .wa-filtros__cab, .wa-filtros > .wa-enlace { grid-column: 1 / -1; }
+  .wa-filtros fieldset { border-bottom: 0; padding-bottom: 0; }
+  .wa-tabs { overflow-x: auto; gap: var(--espacio-4); white-space: nowrap; }
+}
+@media (max-width: 700px) {
+  .wa-ancho { padding-inline: var(--espacio-3); }
+  .wa-titulo h1 { font-size: 24px; }
+  .wa-buscador { flex-direction: column; }
+  .wa-buscador__campo + .wa-buscador__campo { border-left: 0; border-top: 1px solid var(--color-borde); }
+  .wa-grid { grid-template-columns: 1fr; }
+  .wa-filtros { grid-template-columns: 1fr; }
+  .wa-resultados__cab { flex-direction: column; align-items: flex-start; }
+  .wa-ficha__cab { flex-direction: column; }
+  .wa-ficha__cab h1 { font-size: 26px; }
+  .wa-galeria { grid-template-columns: 1fr; grid-template-rows: 240px; }
+  .wa-galeria__lado { display: none; }
+  .wa-galeria__vacia { height: 240px; }
+  .wa-ubic, .wa-dos-bloques, .wa-resenas { grid-template-columns: 1fr; }
+  .wa-ubic__mapa { min-height: 180px; }
+  .wa-bloque, .wa-reserva { padding: var(--espacio-4); }
+  .wa-cats { padding-inline: var(--espacio-2); }
+  .wa-cats__item { padding: 12px 10px; }
+  .wa-pie { flex-direction: column; align-items: flex-start; }
+  .wa-pie__links { flex-wrap: wrap; gap: var(--espacio-3); }
+  .web-cab__busqueda { order: 3; flex-basis: 100%; max-width: none; margin: 0; }
+  .web-cab--interior .web-cab__nav { margin-left: 0; }
+  .web-cab__links { gap: var(--espacio-3); }
+  .p-contenido { padding: var(--espacio-3); }
+  .p-estrecho { max-width: none; }
+}
+@media (max-width: 480px) {
+  .web-cab__links { flex-wrap: wrap; justify-content: flex-end; }
+  .wa-horas { grid-template-columns: repeat(3, 1fr); }
+}

@@ -24,7 +24,7 @@ El diseño registra al proveedor en 4 pasos (Cuenta, Negocio, Servicios, Publica
 |---|---|---|
 | POST | `/auth/registro/proveedor` | `{ nombre, apellidos, email, password, negocio: { nombre, categoria, subcategoria?, telefono, ciudad, colonia }, aceptaTerminos: true, recibirNovedades?: boolean }`. Crea usuario (`rol: 'negocio'`) y negocio con `estado: 'en_proceso'`. Devuelve `{ token, usuario }`. Envía correo con enlace para verificar la cuenta |
 | POST | `/auth/verificar-correo` | `{ token }` del enlace del correo |
-| POST | `/auth/google`, `/auth/github`, `/auth/facebook` | El login web muestra Google, GitHub y Facebook (la app móvil, Google y Apple). Validar el token con la librería oficial de cada proveedor |
+| POST | `/auth/google`, `/auth/github`, `/auth/facebook` | El login web muestra Google, GitHub y Facebook. Validar el token con la librería oficial de cada proveedor |
 | GET 🔒 | `/auth/me` | Debe incluir `apellidos` y, para proveedores, `negocioId` y `estadoNegocio` |
 
 Cambios en datos existentes:
@@ -117,7 +117,7 @@ Está en el menú pero **no tiene diseño**. Propuesta mínima, a confirmar con 
 | POST 🔒 | `/proveedor/solicitudes/:id/proponer-horario` | `{ fecha, horaInicio }` |
 | POST 🔒 | `/proveedor/solicitudes/:id/rechazar` | `{ motivo? }` |
 | POST 🔒 | `/proveedor/solicitudes/:id/completar`, `/cancelar` | |
-| POST 🔒 | `/solicitudes` | **Cliente** (rol `cliente`): `{ negocioId, servicioId, fecha, horaInicio, modalidad, direccion?, nota? }`. La app móvil usará esta misma ruta |
+| POST 🔒 | `/solicitudes` | **Cliente** (rol `cliente`): `{ negocioId, servicioId, fecha, horaInicio, modalidad, direccion?, nota? }` |
 | GET 🔒 | `/solicitudes/mias` | **Cliente**: sus solicitudes (pantalla Reservaciones) |
 
 ## 8. Mensajes
