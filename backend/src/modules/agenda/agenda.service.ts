@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
 import { NegocioVistaService } from '../../base/negocio-vista.service';
 import { NotificacionesService } from '../../base/notificaciones.service';
-import { borrarFoto, guardarFoto } from '../../common/almacenamiento';
+import { borrarFoto, guardarFoto, urlPublica } from '../../common/almacenamiento';
 import { Cita, DetalleNegocio, HorarioNegocio, Mensaje, Negocio, Resena, RespuestaResena, Servicio, Usuario } from '../../entidades';
 import { CrearCitaDto, DisponibilidadDto, MensajeDto, ProponerHorarioDto, ServicioDto } from './dto';
 import { DIAS, HORARIO_INICIAL, REGLAS_INICIALES, AgendaNegocio, ahoraLocal, aMin, horasDelDia, reglasDe } from './disponibilidad';
@@ -262,7 +262,7 @@ export class AgendaService {
     type Conv = { con: { id: string; nombre: string; imagenUrl?: string | null }; ultimo: { texto: string; de: string; creadoEn: Date }; sinLeer: number };
     const mapa = new Map<string, Conv>();
     for (const m of filas) {
-      const otro = lado === 'negocio' ? { id: m.cliente.id, nombre: m.cliente.nCompleto } : { id: m.negocio.id, nombre: m.negocio.tradeName, imagenUrl: m.negocio.coverUrl };
+      const otro = lado === 'negocio' ? { id: m.cliente.id, nombre: m.cliente.nCompleto } : { id: m.negocio.id, nombre: m.negocio.tradeName, imagenUrl: urlPublica(m.negocio.coverUrl) };
       if (!mapa.has(otro.id)) mapa.set(otro.id, { con: otro, ultimo: { texto: m.body, de: m.sender, creadoEn: m.createdAt }, sinLeer: 0 });
       if (!m.readAt && m.sender !== lado) mapa.get(otro.id)!.sinLeer += 1;
     }

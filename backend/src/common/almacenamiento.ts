@@ -85,3 +85,9 @@ export async function borrarFoto(url: string | null | undefined) {
     /* la foto ya no existe o no se pudo borrar: no es crítico */
   }
 }
+
+// Las fotos de los negocios de ejemplo se guardan como "/ejemplos/archivo.jpg": se completan con la URL pública del backend
+export function urlPublica(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.startsWith('/') ? `${process.env.PUBLIC_URL ?? `http://localhost:${process.env.PORT ?? 3001}`}${url}` : url;
+}

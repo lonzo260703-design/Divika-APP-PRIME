@@ -42,6 +42,11 @@ export class CategoriasService implements OnModuleInit {
     await this.recargar();
   }
 
+  // Slugs de las subcategorías del catálogo actual (las demás se pueden limpiar si nadie las usa)
+  slugsSubcategorias() {
+    return CATALOGO.flatMap((c) => c.subcategorias.map((sub) => `${c.slug}-${aSlug(sub)}`));
+  }
+
   async recargar() {
     const todas = await this.repo.find({ order: { createdAt: 'ASC', name: 'ASC' } });
     const orden = (slug: string) => {

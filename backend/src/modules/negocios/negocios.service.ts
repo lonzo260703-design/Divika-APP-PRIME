@@ -28,34 +28,45 @@ export class NegociosService implements OnModuleInit {
     private ds: DataSource,
   ) {}
 
-  // Negocios de ejemplo (source = 'precargado', sin dueño). Solo si la tabla está vacía y SEMBRAR_EJEMPLOS no es "false".
-  // No se inventan reseñas: su calificación queda en 0 hasta que alguien opine.
+  // Negocios de ejemplo (source = 'precargado', sin dueño), tomados del diseño en Figma.
+  // Se cargan si la base no tiene negocios, o reemplazan a los ejemplos anteriores. Nunca tocan negocios reales.
+  // No se inventan reseñas: su calificación queda en 0 hasta que alguien opine. SEMBRAR_EJEMPLOS=false lo apaga.
   async onModuleInit() {
-    if (process.env.SEMBRAR_EJEMPLOS === 'false' || (await this.repo.count()) > 0) return;
+    if (process.env.SEMBRAR_EJEMPLOS === 'false') return;
     await this.cats.listo();
+    const total = await this.repo.count();
+    const ejemplos = await this.repo.count({ where: { source: 'precargado' } });
+    const alDia = await this.repo.existsBy({ slug: NEGOCIOS_EJEMPLO[0].slug, source: 'precargado' });
+    if (alDia || (total > 0 && ejemplos === 0)) return;
     const horario = [
       [0, null, null, true], [1, '09:00', '19:00', false], [2, '09:00', '19:00', false], [3, '09:00', '19:00', false],
       [4, '09:00', '19:00', false], [5, '09:00', '19:00', false], [6, '10:00', '15:00', false],
     ] as const;
     await this.ds.transaction(async (m) => {
-      for (const [i, [nombre, categoria, subcategoria, , km]] of NEGOCIOS_EJEMPLO.entries()) {
+      // Ejemplos anteriores (se borran en cascada sus fotos, horarios, favoritos y citas de prueba)
+      if (ejemplos > 0) await m.delete(Negocio, { source: 'precargado' });
+      for (const [i, e] of NEGOCIOS_EJEMPLO.entries()) {
         // Hacia el norte o hacia el este del centro, para que la distancia coincida con la del diseño
-        const lat = CENTRO.lat + (i % 2 === 0 ? km / 111 : 0);
-        const lng = CENTRO.lng + (i % 2 === 1 ? km / (111 * Math.cos((CENTRO.lat * Math.PI) / 180)) : 0);
-        const tel = `618${String(1000000 + i * 1373).slice(0, 7)}`;
+        const lat = CENTRO.lat + (i % 2 === 0 ? e.km / 111 : 0);
+        const lng = CENTRO.lng + (i % 2 === 1 ? e.km / (111 * Math.cos((CENTRO.lat * Math.PI) / 180)) : 0);
+        // Número de ejemplo que no existe (la central 000 no se asigna): así nadie llama a un teléfono real
+        const tel = `6180000${String(i + 1).padStart(3, '0')}`;
         const n = await m.save(
-          m.create(Negocio, { tradeName: nombre, slug: slugNegocio(nombre), phonePublic: tel, whatsapp: tel, coverUrl: img(i + 1), status: 'verificado', source: 'precargado' }),
+          m.create(Negocio, { tradeName: e.nombre, slug: e.slug, shortDescription: e.descripcion, phonePublic: tel, whatsapp: tel, coverUrl: `/ejemplos/${e.slug}.jpg`, status: 'verificado', source: 'precargado' }),
         );
-        const { principal, sub } = this.cats.ids(categoria, subcategoria);
+        const { principal, sub } = this.cats.ids(e.categoria, e.subcategoria);
         await m.insert(NegocioCategoria, [{ businessId: n.id, categoryId: principal, isPrimary: true }, ...(sub ? [{ businessId: n.id, categoryId: sub, isPrimary: false }] : [])]);
         await m.insert(DireccionNegocio, {
-          businessId: n.id, street: `Av. 20 de Noviembre ${100 + i * 7}`, neighborhood: 'Centro', city: 'Durango', state: 'Durango', postalCode: '34000',
+          businessId: n.id, street: 'Dirección por confirmar', neighborhood: e.colonia, city: 'Durango', state: 'Durango', postalCode: '34000',
           location: { type: 'Point', coordinates: [lng, lat] },
         });
-        await m.insert(HorarioNegocio, horario.map(([weekday, openTime, closeTime, isClosed]) => ({ businessId: n.id, weekday, openTime, closeTime, isClosed })));
-        await m.insert(DetalleNegocio, { businessId: n.id, locationConfirmed: true });
+        if (e.colonia) await m.insert(HorarioNegocio, horario.map(([weekday, openTime, closeTime, isClosed]) => ({ businessId: n.id, weekday, openTime, closeTime, isClosed })));
+        await m.insert(DetalleNegocio, { businessId: n.id, locationConfirmed: false });
       }
+      // Subcategorías que ya no están en el catálogo y nadie usa
+      await m.query(`DELETE FROM categories c WHERE c.parent_id IS NOT NULL AND NOT (c.slug = ANY($1)) AND NOT EXISTS (SELECT 1 FROM business_categories bc WHERE bc.category_id = c.id)`, [this.cats.slugsSubcategorias()]);
     });
+    await this.cats.recargar();
   }
 
   async listar(f: { buscar?: string; categoria?: string; subcategoria?: string; orden?: 'calificacion' | 'distancia'; lat?: number; lng?: number }) {

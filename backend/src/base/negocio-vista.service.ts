@@ -4,6 +4,7 @@ import { DataSource, In, IsNull, Repository } from 'typeorm';
 import { DetalleNegocio, DireccionNegocio, FotoNegocio, HorarioNegocio, Negocio, NegocioCategoria } from '../entidades';
 import { AgendaNegocio, DIAS } from '../modules/agenda/disponibilidad';
 import { CategoriasService } from './categorias.service';
+import { urlPublica } from '../common/almacenamiento';
 
 export type EstadoApi = 'en_proceso' | 'publicado' | 'pausado';
 
@@ -138,7 +139,7 @@ export class NegocioVistaService {
         horariosJson: this.horariosJson(hrs.filter((h) => h.businessId === n.id)),
         calificacion: c ? Math.round(c.prom * 10) / 10 : 0,
         totalResenas: c?.total ?? 0,
-        imagenUrl: n.coverUrl ?? galeria[0] ?? null,
+        imagenUrl: urlPublica(n.coverUrl) ?? galeria[0] ?? null,
         galeria,
         metodosPago: det?.paymentMethods ?? null,
         atiendeDomicilio: det?.homeService ?? false,
