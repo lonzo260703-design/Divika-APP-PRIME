@@ -1,14 +1,30 @@
 'use client';
 
 import Link from 'next/link';
-import { ImagenOpcional } from './ImagenOpcional';
+import { useEffect, useState } from 'react';
+
+// Video del banner: en automático, sin sonido y en bucle. Con "reducir movimiento" se muestra solo la portada.
+function VideoBanner() {
+  const [quieto, setQuieto] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    setQuieto(!!m?.matches);
+  }, []);
+  if (quieto) return <img src="/web/banner-video.jpg" alt="Divika: explora tu ciudad desde la app" className="ban__img" />;
+  return (
+    <video className="ban__img" autoPlay muted loop playsInline preload="metadata" poster="/web/banner-video.jpg" aria-label="Divika: explora tu ciudad desde la app">
+      <source src="/web/banner-video.webm" type="video/webm" />
+      <source src="/web/banner-video.mp4" type="video/mp4" />
+    </video>
+  );
+}
 
 // Banner "La app de servicios" (diseño "Inicio mejorado" en Figma)
 export function BannerApp() {
   return (
     <section className="ban">
       <div className="ban__grid">
-        <ImagenOpcional src="/web/banner-figma.jpg" alt="Divika: explora tu ciudad desde la app" etiqueta="Imagen: banner-figma.jpg" className="ban__img" />
+        <VideoBanner />
         <div className="ban__texto">
           <h2>DIVIKA<br />La app de servicios</h2>
           <p>Descarga la app para celular, ya disponible. Tus lugares, favoritos y reservaciones contigo.</p>
