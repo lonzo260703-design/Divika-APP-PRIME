@@ -373,7 +373,7 @@
 .wa-ancho { width: 100%; max-width: var(--web-ancho); margin: 0 auto; padding: var(--espacio-4) var(--espacio-4) var(--espacio-6); display: flex; flex-direction: column; gap: var(--espacio-4); }
 
 /* Barra de categorías */
-.wa-cats { display: flex; gap: 4px; padding: 0 var(--espacio-4); overflow-x: auto; background: #fff; border-bottom: 1px solid var(--color-borde); }
+.wa-cats { display: flex; gap: 0; padding: 0 var(--espacio-4); overflow-x: auto; background: #fff; border-bottom: 1px solid var(--color-borde); }
 .wa-cats__item { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1 0 auto; padding: 14px 16px; border-bottom: 2px solid transparent; color: #666; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .wa-cats__item svg { width: 18px; height: 18px; }
 .wa-cats__item:hover { color: var(--color-primario); }
@@ -982,3 +982,45 @@ img { max-width: 100%; }
   .ban__texto { padding: 24px 48px 24px 0; }
 }
 @media (max-width: 480px) { .ban__tienda { width: auto; flex: 1; } }
+
+/* ===== Tarjeta de reserva igual al Figma ===== */
+.wa-reserva { gap: 14px; }
+.wa-reserva > .wa-campo + .wa-campo { padding-top: 14px; border-top: 1px solid var(--ini-borde); }
+.wa-mes__cab { margin: 2px 0 10px; }
+.wa-mes__cab strong { font-size: 14px; color: var(--ini-tinta); }
+.wa-mes__cab button { color: var(--ini-morado); }
+.wa-mes__grid { gap: 6px 8px; }
+.wa-mes__grid small { font-size: 10px; color: var(--ini-gris); }
+.wa-dia { aspect-ratio: auto; height: 30px; border: 1px solid transparent; border-radius: 6px; background: var(--ini-lila); color: var(--ini-tinta); font-size: 12px; font-weight: 500; }
+.wa-dia:hover:not(:disabled) { border-color: var(--ini-morado); }
+.wa-dia:disabled { background: #f3f3f8; color: #b9bbcc; text-decoration: line-through; }
+.wa-dia--sel { background: var(--ini-morado); color: #fff; font-weight: 700; }
+.wa-mes__leyenda { display: flex; gap: 14px; margin-top: 10px; font-size: 10px; font-weight: 400; color: var(--ini-gris); }
+.wa-mes__leyenda span { display: inline-flex; align-items: center; gap: 5px; }
+.wa-mes__leyenda i { width: 9px; height: 9px; border-radius: 2px; background: #f3f3f8; border: 1px solid var(--ini-borde); }
+.wa-mes__leyenda i.libre { background: var(--ini-lila); border-color: var(--ini-lila); }
+.wa-mes__leyenda i.sel { background: var(--ini-morado); border-color: var(--ini-morado); }
+.wa-horario { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--ini-borde); font-size: 13px; }
+.wa-horario__cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.wa-horario__cab strong { color: var(--ini-tinta); }
+.wa-horario small { color: var(--ini-gris); font-size: 12px; }
+.wa-horas { gap: 10px; margin-top: 4px; }
+.wa-horas button { padding: 9px 0; border-color: var(--ini-borde); border-radius: 6px; color: var(--ini-tinta); }
+.wa-horas button.activa { background: var(--ini-morado); border-color: var(--ini-morado); }
+.wa-resumen { gap: 8px; padding: 16px; background: #f6f6fb; font-size: 12px; }
+.wa-resumen > strong { font-size: 13px; color: var(--ini-tinta); }
+.wa-resumen__fecha { color: var(--ini-morado); }
+.wa-resumen > div { color: var(--ini-gris); }
+.wa-resumen > div > span:last-child { color: var(--ini-tinta); }
+.wa-resumen__total { margin-top: 4px; padding-top: 12px; border-top-color: var(--ini-borde); align-items: center; }
+.wa-resumen__total span { color: var(--ini-tinta); }
+.wa-resumen__total strong { font-size: 22px; color: var(--ini-morado); }
+.wa-reserva .wa-btn-primario { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 42px; border-radius: 8px; }
+.wa-reserva .wa-cambios { padding: 14px 0 0; border-top: 1px solid var(--ini-borde); border-radius: 0; background: none; }
+.wa-reserva .wa-cambios p { font-size: 12px; }
+
+/* Barra de categorías: las 12 caben sin scroll en computadora */
+@media (min-width: 1100px) {
+  .wa-cats { overflow-x: visible; justify-content: center; }
+  .wa-cats__item { flex: 0 1 auto; padding: 12px clamp(6px, .9vw, 14px); font-size: clamp(11px, .85vw, 13px); }
+}

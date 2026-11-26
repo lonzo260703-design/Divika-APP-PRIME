@@ -11,6 +11,13 @@ import type { Cita, NegocioDetalle, OfertaDia, Servicio } from '@/types';
 
 const CLAVES = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 const SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const aFecha = (f: string) => new Date(`${f}T00:00`);
+// "Jueves 12 de noviembre"
+const diaLargo = (f: string) => { const d = aFecha(f); return `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()}`; };
+// "12 nov 2026"
+const fechaCortaAnio = (f: string) => { const d = aFecha(f); return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3).toLowerCase()} ${d.getFullYear()}`; };
 
 // Tarjeta de reserva del detalle web: servicio, lugar, fecha y hora en un solo lugar
 export function ReservaLinea({ negocio, servicios }: { negocio: NegocioDetalle; servicios: Servicio[] }) {
@@ -106,11 +113,13 @@ export function ReservaLinea({ negocio, servicios }: { negocio: NegocioDetalle; 
       </div>
 
       {fecha && (
-        <div className="wa-campo">{fechaLarga(fecha)}
+        <div className="wa-horario">
+          <div className="wa-horario__cab"><strong>{diaLargo(fecha)}</strong>{oferta?.abierto && <small>{servicio?.duracionMin ?? oferta.duracionMin} min</small>}</div>
           {!oferta && <small>Buscando horarios…</small>}
           {oferta && !oferta.abierto && <small>{oferta.motivo ?? 'Sin disponibilidad ese día.'}</small>}
           {oferta?.abierto && (
             <>
+              <small>Horarios disponibles. Hora del centro de México.</small>
               <div className="wa-horas">
                 {oferta.horas.map((h) => <button key={h.hora} type="button" disabled={!h.libre} aria-pressed={hora === h.hora} className={cx(hora === h.hora && 'activa')} onClick={() => setHora(h.hora)}>{h.hora}</button>)}
               </div>
@@ -131,16 +140,17 @@ export function ReservaLinea({ negocio, servicios }: { negocio: NegocioDetalle; 
 
       <div className="wa-resumen">
         <strong>Tu selección</strong>
-        <p>{fecha && hora ? `${fechaLarga(fecha)} · ${hora} h${aDomicilio ? ' · A domicilio' : ''}` : 'Elige día y hora'}</p>
+        <p className="wa-resumen__fecha">{fecha && hora ? `${fechaCortaAnio(fecha)} · ${hora} h · ${aDomicilio ? 'A domicilio' : 'En el negocio'}` : 'Elige día y hora'}</p>
         {servicio && <div><span>{servicio.nombre}</span><span>{pesos(servicio.precio)}</span></div>}
-        {traslado > 0 && <div><span>Traslado</span><span>{pesos(traslado)}</span></div>}
+        <div><span>Para {personas} {personas === 1 ? 'persona' : 'personas'}</span><span>Sin anticipo</span></div>
+        {servicio && <div><span>{aDomicilio ? 'Traslado a domicilio' : 'Atención en el negocio'}</span><span>{traslado > 0 ? pesos(traslado) : 'Sin cargo extra'}</span></div>}
         <div className="wa-resumen__total"><span>Total estimado</span><strong>{servicio && servicio.precio != null ? pesos(servicio.precio + traslado) : 'A consultar'}</strong></div>
       </div>
 
       {error && <p className="form__error">{error}</p>}
-      <button type="button" className="wa-btn-primario" disabled={faltan || enviando} onClick={enviar}>{enviando ? 'Enviando…' : t.boton}</button>
-      <Link href={`/negocio/${negocio.id}/reservar`} className="wa-enlace wa-enlace--centro">Prefiero reservar paso a paso</Link>
+      <button type="button" className="wa-btn-primario" disabled={faltan || enviando} onClick={enviar}>{enviando ? 'Enviando…' : <><span aria-hidden>→</span> {t.boton}</>}</button>
       <p className="wa-nota wa-nota--centro">Aún no es una reserva confirmada. Divika no cobra: el pago se acuerda con el negocio.</p>
+      <Link href={`/negocio/${negocio.id}/reservar`} className="wa-enlace wa-enlace--centro">Prefiero reservar paso a paso</Link>
       <div className="wa-cambios"><IconShield /><div><strong>Cambios y cancelaciones</strong><p>Puedes cancelar desde Mis reservas. Para cambiar fecha u hora, escríbele al negocio.</p></div></div>
     </aside>
   );
@@ -162,7 +172,7 @@ export function CalendarioMes({ negocio, fecha, onFecha }: { negocio: NegocioDet
     <div className="wa-mes">
       <div className="wa-mes__cab">
         <button type="button" aria-label="Mes anterior" disabled={mes.getFullYear() * 12 + mes.getMonth() <= mesActual} onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}>‹</button>
-        <strong>{mes.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}</strong>
+        <strong>{MESES[mes.getMonth()]} {mes.getFullYear()}</strong>
         <button type="button" aria-label="Mes siguiente" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))}>›</button>
       </div>
       <div className="wa-mes__grid">
@@ -174,6 +184,7 @@ export function CalendarioMes({ negocio, fecha, onFecha }: { negocio: NegocioDet
           return <button key={f} type="button" disabled={!libre} aria-pressed={fecha === f} className={cx('wa-dia', fecha === f && 'wa-dia--sel')} onClick={() => onFecha(f)}>{d.getDate()}</button>;
         })}
       </div>
+      <p className="wa-mes__leyenda" aria-hidden><span><i className="libre" />Disponible</span><span><i />No disponible</span><span><i className="sel" />Elegido</span></p>
     </div>
   );
 }
