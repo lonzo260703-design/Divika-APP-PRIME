@@ -53,7 +53,7 @@ export function MarcoWeb({ children }: { children: ReactNode }) {
           <main className={cx('wa-contenido', !ancho && 'wa-contenido--estrecho')}>{children}</main>
         )}
         {inicio && <BannerApp />}
-        <PieSimple />
+        <PieSimple corto={/\/reservar$/.test(ruta)} />
       </div>
     </Ctx.Provider>
   );

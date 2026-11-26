@@ -15,9 +15,9 @@ const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', '
 const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 const aFecha = (f: string) => new Date(`${f}T00:00`);
 // "Jueves 12 de noviembre"
-const diaLargo = (f: string) => { const d = aFecha(f); return `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()}`; };
+export const diaLargo = (f: string) => { const d = aFecha(f); return `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()}`; };
 // "12 nov 2026"
-const fechaCortaAnio = (f: string) => { const d = aFecha(f); return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3).toLowerCase()} ${d.getFullYear()}`; };
+export const fechaCortaAnio = (f: string) => { const d = aFecha(f); return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3).toLowerCase()} ${d.getFullYear()}`; };
 
 // Tarjeta de reserva del detalle web: servicio, lugar, fecha y hora en un solo lugar
 export function ReservaLinea({ negocio, servicios }: { negocio: NegocioDetalle; servicios: Servicio[] }) {
@@ -157,7 +157,8 @@ export function ReservaLinea({ negocio, servicios }: { negocio: NegocioDetalle; 
 }
 
 // Calendario mensual con los días en que abre el negocio (se usa en la tarjeta y en el asistente)
-export function CalendarioMes({ negocio, fecha, onFecha }: { negocio: NegocioDetalle; fecha: string; onFecha: (f: string) => void }) {
+// grande = asistente de reserva (encabezado a la izquierda, sin leyenda)
+export function CalendarioMes({ negocio, fecha, onFecha, grande = false }: { negocio: NegocioDetalle; fecha: string; onFecha: (f: string) => void; grande?: boolean }) {
   const [mes, setMes] = useState(() => { const h = fecha ? new Date(`${fecha}T00:00`) : new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
   const hoy = iso(new Date());
   const celdas = useMemo(() => {
@@ -169,10 +170,10 @@ export function CalendarioMes({ negocio, fecha, onFecha }: { negocio: NegocioDet
   const abreEseDia = (d: Date) => { const h = negocio.horariosJson?.[CLAVES[d.getDay()]]; return !negocio.horariosJson || (!!h && !h.cerrado); };
   const mesActual = new Date().getFullYear() * 12 + new Date().getMonth();
   return (
-    <div className="wa-mes">
+    <div className={cx('wa-mes', grande && 'wa-mes--grande')}>
       <div className="wa-mes__cab">
         <button type="button" aria-label="Mes anterior" disabled={mes.getFullYear() * 12 + mes.getMonth() <= mesActual} onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() - 1, 1))}>‹</button>
-        <strong>{MESES[mes.getMonth()]} {mes.getFullYear()}</strong>
+        <strong>{MESES[mes.getMonth()]} {grande ? 'de ' : ''}{mes.getFullYear()}</strong>
         <button type="button" aria-label="Mes siguiente" onClick={() => setMes(new Date(mes.getFullYear(), mes.getMonth() + 1, 1))}>›</button>
       </div>
       <div className="wa-mes__grid">
@@ -184,7 +185,7 @@ export function CalendarioMes({ negocio, fecha, onFecha }: { negocio: NegocioDet
           return <button key={f} type="button" disabled={!libre} aria-pressed={fecha === f} className={cx('wa-dia', fecha === f && 'wa-dia--sel')} onClick={() => onFecha(f)}>{d.getDate()}</button>;
         })}
       </div>
-      <p className="wa-mes__leyenda" aria-hidden><span><i className="libre" />Disponible</span><span><i />No disponible</span><span><i className="sel" />Elegido</span></p>
+      {!grande && <p className="wa-mes__leyenda" aria-hidden><span><i className="libre" />Disponible</span><span><i />No disponible</span><span><i className="sel" />Elegido</span></p>}
     </div>
   );
 }

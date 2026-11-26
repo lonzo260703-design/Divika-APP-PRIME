@@ -900,47 +900,77 @@ img { max-width: 100%; }
 .wa-cambios strong { display: block; font-size: 13px; }
 .wa-cambios p { margin: 2px 0 0; color: var(--ini-gris); font-size: 12.5px; line-height: 1.45; }
 
-.rsv-pasos { display: flex; gap: 8px; margin: var(--espacio-4) 0 var(--espacio-5); padding: 0; list-style: none; overflow-x: auto; }
-.rsv-pasos li { display: flex; flex: 1 0 auto; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: var(--ini-fondo); color: var(--ini-gris); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.rsv-pasos span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 1px solid var(--ini-borde); font-size: 12px; }
-.rsv-pasos span svg { width: 14px; height: 14px; }
-.rsv-pasos--actual { background: var(--ini-lila) !important; color: var(--ini-morado) !important; }
-.rsv-pasos--actual span { background: var(--ini-morado); border-color: var(--ini-morado); color: #fff; }
-.rsv-pasos--hecho { color: var(--ini-tinta) !important; }
-.rsv-pasos--hecho span { background: var(--ini-lila); border-color: var(--ini-lila); color: var(--ini-morado); }
-.rsv-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--espacio-5); align-items: start; }
-.rsv-panel, .rsv-lado { display: flex; flex-direction: column; gap: var(--espacio-4); padding: var(--espacio-5); border: 1px solid var(--ini-borde); border-radius: 14px; background: #fff; }
-.rsv-panel h1 { margin: 0; color: var(--ini-tinta); font-size: 24px; }
-.rsv-sub { margin: -8px 0 0; color: var(--ini-gris); }
-.rsv-fecha { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--espacio-4); }
+/* ===== Asistente de reserva (Figma "Web · Reserva · Fecha y hora") ===== */
+.rsv { gap: 0; }
+.rsv-migas { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--ini-gris); }
+.rsv-migas a { color: var(--ini-gris); text-decoration: none; }
+.rsv-migas a:hover { color: var(--ini-morado); }
+.rsv-titulo { margin: 14px 0 18px; font-size: clamp(22px, 2.2vw, 28px); color: var(--ini-tinta); }
+.rsv-pasos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; padding: 0; list-style: none; }
+.rsv-pasos li { display: flex; align-items: center; min-height: 36px; padding: 8px 12px; border-radius: 6px; background: var(--ini-lila); color: var(--ini-morado); font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rsv-pasos--actual { background: var(--ini-morado) !important; color: #fff !important; }
+.rsv-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.rsv-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.rsv-panel { display: flex; flex-direction: column; gap: 20px; padding: 20px; border-radius: 10px; background: #fff; }
+.rsv-servicio { display: grid; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--ini-borde); }
+.rsv-sub { color: var(--ini-gris); font-size: 14px; }
+.rsv-nota { color: var(--ini-gris); font-size: 12px; }
+/* Calendario grande */
+.wa-mes--grande .wa-mes__cab { justify-content: flex-start; gap: 0; margin: 0 0 16px; }
+.wa-mes--grande .wa-mes__cab strong { order: -1; margin-right: auto; font-size: 18px; }
+.wa-mes--grande .wa-mes__cab button { width: 36px; font-size: 22px; }
+.wa-mes--grande .wa-mes__grid { gap: 10px 10px; text-align: left; }
+.wa-mes--grande .wa-mes__grid small { font-size: 11px; }
+.wa-mes--grande .wa-dia { height: 32px; font-size: 13px; text-align: center; }
+.wa-mes--grande .wa-dia:disabled { background: #efeff4; color: #b9bbcc; text-decoration: none; }
+/* Horas */
+.rsv-horas { display: flex; flex-direction: column; gap: 14px; }
+.rsv-horas h2 { font-size: 14px; color: var(--ini-tinta); }
+.rsv-horas__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.rsv-horas__grid button { display: flex; align-items: center; gap: 4px; min-height: 32px; padding: 6px 10px; border: 1px solid var(--ini-borde); border-radius: 6px; background: #fff; color: var(--ini-morado); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; }
+.rsv-horas__grid button svg { width: 12px; height: 12px; }
+.rsv-horas__grid button:hover:not(:disabled) { border-color: var(--ini-morado); }
+.rsv-horas__grid button:disabled { color: #b9bbcc; text-decoration: line-through; cursor: default; }
+.rsv-horas__grid button.activa { border-color: var(--ini-morado); background: var(--ini-morado); color: #fff; font-weight: 600; }
+/* Botones de abajo */
+.rsv-botones { display: grid; grid-template-columns: minmax(0, 210px) minmax(0, 290px); gap: 22px; }
+.rsv-btn, .rsv-btn-borde { display: flex; align-items: center; gap: 6px; min-height: 32px; padding: 8px 12px; border-radius: 6px; font: inherit; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.rsv-btn { border: 1px solid var(--ini-morado); background: var(--ini-morado); color: #fff; }
+.rsv-btn:disabled { opacity: .5; cursor: default; }
+.rsv-btn-borde { border: 1px solid var(--ini-borde); background: #fff; color: var(--ini-morado); }
+/* Paso 2 y 3 */
 .rsv-contador { display: inline-flex; align-items: center; gap: 18px; align-self: flex-start; padding: 8px; border: 1px solid var(--ini-borde); border-radius: 999px; }
 .rsv-contador button { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--ini-lila); color: var(--ini-morado); font-size: 20px; font-weight: 700; cursor: pointer; }
 .rsv-contador button:disabled { opacity: .4; cursor: default; }
-.rsv-panel textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--ini-borde); border-radius: 10px; font: inherit; resize: vertical; }
-.rsv-datos { display: grid; gap: 0; margin: 0; }
+.rsv-panel textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--ini-borde); border-radius: 8px; font: inherit; font-size: 13px; font-weight: 400; resize: vertical; }
+.rsv-datos { display: grid; margin: 0; }
 .rsv-datos div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ini-borde); }
 .rsv-datos dt { color: var(--ini-gris); font-size: 13px; }
 .rsv-datos dd { margin: 0; color: var(--ini-tinta); font-weight: 600; overflow-wrap: anywhere; }
-.rsv-botones { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: var(--espacio-2); }
-.rsv-botones > * { min-width: 140px; justify-content: center; text-align: center; }
 .rsv-ok { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: var(--espacio-5) 0; text-align: center; }
-.rsv-ok .rsv-botones { justify-content: center; }
-.rsv-lado__neg { display: flex; gap: 12px; align-items: center; }
-.rsv-lado__neg img, .rsv-lado__sinfoto { flex: none; width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--ini-lila); display: grid; place-items: center; }
-.rsv-lado__neg strong { display: block; color: var(--ini-tinta); }
-.rsv-lado__neg small { display: block; color: var(--ini-gris); font-size: 12.5px; }
-.rsv-lado__calif { display: inline-flex !important; align-items: center; gap: 4px; color: #e8a317 !important; font-weight: 700; }
-.rsv-lado__calif svg { width: 14px; height: 14px; }
+.rsv-ok h2 { font-size: 22px; color: var(--ini-tinta); }
+/* Tarjeta lateral */
+.rsv-lado { display: flex; flex-direction: column; gap: 4px; padding: 14px 14px 20px; border-radius: 10px; background: #fff; }
+.rsv-lado__foto { width: 100%; height: 125px; margin-bottom: 14px; border-radius: 8px; object-fit: cover; }
+.rsv-lado__foto--vacia { display: grid; place-items: center; background: var(--ini-lila); color: var(--ini-morado); font-size: 40px; font-weight: 800; }
+.rsv-lado h2 { margin: 0 0 8px; font-size: 18px; color: var(--ini-tinta); }
+.rsv-lado__gris { font-size: 11px; color: var(--ini-gris); }
+.rsv-lado__cuando { margin: 16px 0 18px; font-size: 13px; line-height: 1.45; color: var(--ini-tinta); }
+.rsv-lado__precios { display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid var(--ini-borde); font-size: 10px; color: var(--ini-gris); }
+.rsv-lado__precios div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+.rsv-lado__etiqueta { margin-top: 18px; font-size: 11px; font-weight: 600; color: var(--ini-tinta); }
+.rsv-lado__total { font-size: 22px; color: var(--ini-morado); }
+.rsv-lado__aviso { margin-top: 12px; font-size: 9px; color: #c0392b; }
 @media (min-width: 900px) {
-  .rsv-cuerpo { grid-template-columns: minmax(0, 1fr) 340px; }
+  .rsv-cuerpo { grid-template-columns: minmax(0, 1fr) 290px; }
   .rsv-lado { position: sticky; top: 72px; }
-  .rsv-fecha { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 }
 @media (max-width: 599px) {
-  .rsv-pasos li { padding: 8px 10px; font-size: 12px; }
-  .rsv-panel, .rsv-lado { padding: var(--espacio-4); }
+  .rsv-pasos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .rsv-horas__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wa-mes--grande .wa-mes__grid { gap: 6px; }
+  .rsv-botones { grid-template-columns: 1fr 1fr; gap: 10px; }
   .rsv-datos div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-  .rsv-botones > * { flex: 1; min-width: 0; }
 }
 
 /* ===== Ajustes al Figma "Vista_Usuario · Inicio mejorado" (colores y estilos; tamaños de antes) ===== */
