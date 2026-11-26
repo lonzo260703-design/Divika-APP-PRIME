@@ -3,13 +3,17 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
-import { IconPin, IconSearch } from '../ui/icons';
 import { Cabecera } from './Cabecera';
 import { ImagenOpcional } from './ImagenOpcional';
 import { BannerApp, PieSimple } from './Pie';
 import { api } from '@/lib/api';
 import { useCategorias } from '@/lib/categorias';
 import type { Negocio } from '@/types';
+
+// Nombres cortos y orden de las categorías como en el diseño
+const NOMBRE_CORTO: Record<string, string> = { hogar: 'Hogar', automotriz: 'Automotriz', limpieza: 'Limpieza' };
+const ORDEN = ['restaurantes', 'salud', 'hogar', 'cafeterias', 'automotriz', 'tecnologia', 'belleza', 'entretenimiento', 'mascotas', 'limpieza', 'estetica', 'ropa'];
+const posicion = (slug: string) => { const i = ORDEN.indexOf(slug); return i < 0 ? ORDEN.length : i; };
 
 const PASOS = [
   ['01', 'Encuentra', 'Busca por servicio, categoría y ubicación.'],
@@ -52,11 +56,11 @@ export function LandingContenido() {
           <form className="ini-buscador" onSubmit={buscar} role="search">
             <label className="ini-buscador__campo">
               <small>¿Qué necesitas hoy?</small>
-              <span><IconSearch /><input value={servicio} onChange={(e) => setServicio(e.target.value)} placeholder="Busca un servicio o negocio" /></span>
+              <input value={servicio} onChange={(e) => setServicio(e.target.value)} placeholder="Busca un servicio o negocio" />
             </label>
             <label className="ini-buscador__campo ini-buscador__ubic">
               <small>Ubicación</small>
-              <span><IconPin /><input value={ciudad} onChange={(e) => setCiudad(e.target.value)} placeholder="Ciudad o colonia (ej. Durango)" /></span>
+              <input value={ciudad} onChange={(e) => setCiudad(e.target.value)} placeholder="Durango, México" />
             </label>
             <button type="submit" className="ini-btn">Buscar servicios <span aria-hidden>→</span></button>
           </form>
@@ -67,8 +71,8 @@ export function LandingContenido() {
         <div className="ini-ancho">
           <h2>Todo lo que necesitas, en un solo lugar</h2>
           <div className="ini-cats">
-            {categorias.map((c) => (
-              <Link key={c.slug} href={`/categoria/${c.slug}`} className="ini-cat">{c.nombre}</Link>
+            {[...categorias].sort((a, b) => posicion(a.slug) - posicion(b.slug)).map((c) => (
+              <Link key={c.slug} href={`/categoria/${c.slug}`} className="ini-cat">{NOMBRE_CORTO[c.slug] ?? c.nombre}</Link>
             ))}
           </div>
         </div>

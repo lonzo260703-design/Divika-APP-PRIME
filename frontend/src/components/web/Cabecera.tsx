@@ -22,18 +22,18 @@ export function Cabecera({ variante = 'inicio' }: { variante?: 'inicio' | 'inter
       <Link href={inicio} aria-label="Divika, inicio" className="web-cab__logo"><img src="/logo.png" alt="Divika" /></Link>
       <nav className="web-cab__nav" aria-label="Explorar">
         <Link href="/home?todos=1" className={cx('web-cab__enlace', explorando && 'web-cab__enlace--fuerte')}>Explorar servicios</Link>
-        <Link href={`${inicio}#como-funciona`} className="web-cab__enlace">Cómo funciona</Link>
+        <Link href={`${inicio}#como-funciona`} className="web-cab__enlace web-cab__enlace--suave">Cómo funciona</Link>
       </nav>
       <nav className="web-cab__links" aria-label="Principal">
         {usuario ? (
           <>
             {usuario.rol !== 'negocio' && <Link href="/reservaciones" className="web-cab__enlace">Mis reservas</Link>}
-            <Link href="/favoritos" className="web-cab__enlace">Guardados</Link>
+            <Link href="/favoritos" className="web-cab__enlace web-cab__enlace--morado">Guardados</Link>
             <Link href={usuario.rol === 'negocio' ? '/portal' : '/perfil'} className="web-cab__boton">{usuario.rol === 'negocio' ? 'Mi portal' : 'Mi cuenta'}</Link>
           </>
         ) : (
           <>
-            <Link href="/login" className="web-cab__enlace">Guardados</Link>
+            <Link href="/login" className="web-cab__enlace web-cab__enlace--morado">Guardados</Link>
             <Link href="/login" className="web-cab__enlace">Iniciar sesión</Link>
             <Link href="/proveedores" className="web-cab__boton">Registrar mi negocio</Link>
           </>
